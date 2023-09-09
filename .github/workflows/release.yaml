@@ -44,16 +44,16 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Update mod in file-diff
-        run: pwd && cd file-diff && pwd && go mod tidy
+        run: cd file-diff && go mod tidy
 
       - name: Update mod in file-diff-cli
-        run: pwd && ls && cd file-diff-cli && pwd && go mod tidy
+        run: cd file-diff-cli && go mod tidy
 
-      - name: Setup Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: ">=1.20.0"
-          cache: true
+    #   - name: Setup Go
+    #     uses: actions/setup-go@v3
+    #     with:
+    #       go-version: ">=1.20.0"
+    #       cache: true
 
       - name: Build
         run: cd file-diff-cli && go build -o ${{ matrix.artifactname }}${{ matrix.artifactext }}
