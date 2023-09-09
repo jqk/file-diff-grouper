@@ -90,7 +90,7 @@ jobs:
           - goos: macos
             artifactext: ""
             os: macos-latest
-            artifactname: "vssc"
+            artifactname: "fdg"
             goarch: arm64
 
     steps:

@@ -4,14 +4,14 @@
 
 ## What is it
 
-FileDiffGrouper is a command line tool for comparing file differences between two directories. It compares all files in the two directories byte-by-byte based on content, rather than filenames. Although only tested on Windows 10/11, it does not use any OS-specific features, so theoretically can run on Linux and MacOS as well.
+`FileDiffGrouper` is a command line tool for comparing file differences between two directories. It compares all files in the two directories byte-by-byte based on content, rather than filenames. Although only tested on Windows 10/11, it does not use any OS-specific features, so theoretically can run on Linux and MacOS as well.
 
-FileDiffGrouper compares two directories - one called the Base directory, the other called the Target directory. FileDiffGrouper will output two result sets, saved to result files:
+`FileDiffGrouper` compares two directories - one called the Base directory, the other called the Target directory. `FileDiffGrouper` will output two result sets, saved to result files:
 
 - MORE set: Files that exist in Target but not in Base, referred to as "extra files" in this document.
 - SAME set: Files that exist in both Target and Base and have identical content, referred to as "duplicate files" in this document.
 
-FileDiffGrouper can optionally move the files in the MORE and SAME sets to specified backup directories, based on options. For safety, it does not provide functionality to automatically delete these files.
+`FileDiffGrouper` can optionally move the files in the MORE and SAME sets to specified backup directories, based on options. For safety, it does not provide functionality to automatically delete these files.
 
 ## What to solve
 
@@ -30,7 +30,7 @@ With the development of electronics technology, we generate a lot of files in wo
 
 Backing up data is a relatively professional job. For most people, it is difficult to manage backups precisely. Backups are often made irregularly over different periods, with no rules for timing, quantity, or destinations. As a result, there are many backup copies, with no clear relationships between different backups, leading to a large number of duplicate and orphaned backups. Using the above tools to find and categorize duplicate files among hundreds of thousands of files is very time consuming and laborious.
 
-FileDiffGrouper is a tool to quickly find identical and different files between two directories.
+`FileDiffGrouper` is a tool to quickly find identical and different files between two directories.
 
 > FileDiffGrouper only finds duplicate and extra files in Target relative to Base. It does not deduplicate Base itself. Please use the tools listed above to deduplicate Base first. Of course, it is recommended to also deduplicate Target before using this tool, to improve efficiency.
 
@@ -49,11 +49,19 @@ FileDiffGrouper is a tool to quickly find identical and different files between 
 
 On Windows, the executable filename is `fdg.exe`, around 6MB in size.
 
+In addition to the executable file, a sample config file is also provided: config.yaml.
+
 ## Usage
 
 ### Command line
 
-Executing the `fdg` command is simple - just provide the full path to the configuration file, e.g. `fdg c:\test\config.yaml`. There are no specific requirements for the configuration filename itself, but it must have the correct file extension, see `Configuration` section for details.
+Executing the `fdg` command is simple - just provide the full path to the configuration file.
+
+```text {.line-numbers}
+fdg c:\test\config.yaml
+```
+
+There are no specific requirements for the configuration filename itself, but it must have the correct file extension, see `Configuration` section for details.
 
 ```text {.line-numbers}
 $ fdg
@@ -70,7 +78,7 @@ Usage:
 
 ### Configuration
 
-Since there are many parameters to specify, command line arguments are not used. Instead, a configuration file is used. The configuration file can be in formats supported by [viper](http://github.com/spf13/viper%7Cgithub.com/spf13/viper) such as `.json`, `.xml,` `.yml` and `.toml`. The example below uses `yaml`. Please refer to the comments.
+Since there are many parameters to specify, command line arguments are not used. Instead, a configuration file is used. The configuration file can be in formats supported by [viper](http://github.com/spf13/viper%7Cgithub.com/spf13/viper) such as `.json`, `.xml,` `.yml` and `.toml`. The example below uses `.yaml`. Please refer to the comments.
 
 You don't need to read through in detail at first. Each parameter in the configuration file will be explained in more detail in the `How It Works and Parameter Descriptions` section.
 
