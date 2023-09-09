@@ -4,12 +4,12 @@
 
 ## 一、 功能
 
-FileDiffGrouper 是一个比较两个目录中文件差异命令行程序，它以二进制方式比较两个目录中的所有文件的内容，而不是文件名。虽然仅在 Windows 10/11 中测试过，但未使用特定的操作系统功能，所以理论上可以在运行于 Linux 和 MacOS。
+FileDiffGrouper 是一个比较两个目录文件差异的命令行工具。它以二进制方式比较两个目录中的所有文件的内容，而不是文件名。虽然仅在 Windows 10/11 中测试过，但未使用特定的操作系统功能，所以理论上可以在运行于 Linux 和 MacOS。
 
 FileDiffGrouper 比较两个目录，一个称为 Base 目录，一个称为 Target 目录。FileDiffGrouper 将给出两个结果集合，保存在结果文件中：
 
-- MORE 集合：Target 比 Base 多的文件，即 Target 中有，但 Base 中没有，本文中称为多出文件。
-- SAME 集合：Target 和 Base 中同时存在的完全相同的文件，本文中称为重复文件。
+- MORE 集合：Target 比 Base 多的文件，即 Target 中有，但 Base 中没有的文本，本文中称为`多出文件`。
+- SAME 集合：Target 和 Base 中同时存在的完全相同的文件，本文中称为`重复文件`。
 
 FileDiffGrouper 可以根据选项，直接将以上两个集合的文件，移动到指定的备份目录中。为保证安全，不提供自动删除这些文件的功能。
 

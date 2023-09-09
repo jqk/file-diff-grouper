@@ -47,7 +47,7 @@ jobs:
         run: cd file-diff && go mod tidy
 
       - name: Update mod in file-diff-cli
-        run: cd ../file-diff-cli && go mod tidy  
+        run: cd file-diff-cli && go mod tidy  
 
       - name: Setup Go
         uses: actions/setup-go@v3
@@ -56,7 +56,7 @@ jobs:
           cache: true
 
       - name: Build
-        run: go build -o ${{ matrix.artifactname }}${{ matrix.artifactext }}
+        run: cd file-diff-cli && go build -o ${{ matrix.artifactname }}${{ matrix.artifactext }}
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
