@@ -75,3 +75,70 @@ jobs:
         with:
           files: |
             file-diff-cli/*.zip
+
+  # 处理 file-diff-cli 的方式有所不同。
+  build-macos:
+    runs-on: macos-latest
+
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        # 定义生成目标的操作系统的相关变量，即使有重复，也要分别定义，如 goarch。
+        include:
+          - goos: macos
+            artifactext: ""
+            os: macos-latest
+            artifactname: "vssc"
+            goarch: arm64
+
+    steps:
+      - name: Get Tag Version
+        id: get_version_new
+        # 首先将  ${{ github.ref }}  的值赋给  tag_name  变量。
+        # 然后，使用字符串截取功能 tag_name=${tag_name#refs/tags/} 来移除 tag_name 中的前缀 "refs/tags/"。
+        # 最后将其保存到环境变量 program_version 中。
+        run: |
+            tag_name=${{ github.ref }}
+            tag_name=${tag_name#refs/tags/}
+            echo "program_version=${tag_name}" >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Update mod in file-diff
+        run: |
+            cd file-diff
+            go mod tidy
+
+      - name: Update mod in file-diff-cli
+        run: |
+            cd file-diff-cli
+            go mod tidy
+  
+      - name: Build for macOS amd64
+        if: matrix.goos == 'macos' && matrix.goarch == 'amd64'  
+        run: cd file-diff-cli && go build -o ${{ matrix.artifactname }}${{ matrix.artifactext }}
+
+      - name: Build for macOS arm64 
+        if: matrix.goos == 'macos' && matrix.goarch == 'arm64'
+        env:
+            CC: o64-clang
+            CXX: o64-clang++ 
+        run: cd file-diff-cli && go build -o ${{ matrix.artifactname }}${{ matrix.artifactext }}
+      
+      - name: Packaging
+        # 即使在 windows 中执行 github action，也不需要提前安装 tar，已内置。
+        # 以下针对 program_version 的警告可忽略，只要保证前面确实在环境变量中有所定义。
+        # run: tar czf  ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ env.program_version }}.tgz ${{ matrix.artifactname }}${{ matrix.artifactext }}
+        run: |
+            cd file-diff-cli
+            zip -r ../${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ env.program_version }}.zip ${{ matrix.artifactname }}${{ matrix.artifactext }} config.yaml
+
+      - name: Create GitHub release from tag
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            *.zip
+            
