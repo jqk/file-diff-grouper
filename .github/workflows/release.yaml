@@ -44,19 +44,19 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Update mod in file-diff
-        run: cd file-diff && go mod tidy
+        run: |
+            cd file-diff
+            go mod tidy
 
       - name: Update mod in file-diff-cli
-        run: cd file-diff-cli && go mod tidy
-
-    #   - name: Setup Go
-    #     uses: actions/setup-go@v3
-    #     with:
-    #       go-version: ">=1.20.0"
-    #       cache: true
+        run: |
+            cd file-diff-cli
+            go mod tidy
 
       - name: Build
-        run: cd file-diff-cli && go build -o ${{ matrix.artifactname }}${{ matrix.artifactext }}
+        run: |
+            cd file-diff-cli
+            go build -o ${{ matrix.artifactname }}${{ matrix.artifactext }}
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
@@ -65,11 +65,13 @@ jobs:
       - name: Packaging
         # 即使在 windows 中执行 github action，也不需要提前安装 zip/tar，已内置。
         # 以下针对 program_version 的警告可忽略，只要保证前面确实在环境变量中有所定义。
-        run: zip -r ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ env.program_version }}.zip ${{ matrix.artifactname }}${{ matrix.artifactext }}
+        run: |
+            cd file-diff-cli
+            zip -r ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ env.program_version }}.zip ${{ matrix.artifactname }}${{ matrix.artifactext }}
 
       - name: Create GitHub release from tag
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            config.yaml
-            *.zip
+            file-diff-cli/config.yaml
+            file-diff-cli/*.zip
