@@ -21,12 +21,12 @@ jobs:
             artifactext: ".exe"
             os: windows-latest
             # 因为不同平台用的内容相同，所以也可以使用 env 定义在外层，但集中一起更直观。
-            artifactname: "fdc"
+            artifactname: "fdg"
             goarch: amd64
           - goos: linux
             artifactext: ""
             os: ubuntu-latest
-            artifactname: "fdc"
+            artifactname: "fdg"
             goarch: amd64
 
     steps:
