@@ -23,11 +23,11 @@ jobs:
             # 因为不同平台用的内容相同，所以也可以使用 env 定义在外层，但集中一起更直观。
             artifactname: "fdc"
             goarch: amd64
-          - goos: linux
-            artifactext: ""
-            os: ubuntu-latest
-            artifactname: "fdc"
-            goarch: amd64
+        #   - goos: linux
+        #     artifactext: ""
+        #     os: ubuntu-latest
+        #     artifactname: "fdc"
+        #     goarch: amd64
 
     steps:
       - name: Get Tag Version
@@ -46,6 +46,9 @@ jobs:
       - name: Update mod in file-diff
         run: cd file-diff && go mod tidy
 
+      - name: Show current path
+        run: pwd
+        
       - name: Update mod in file-diff-cli
         run: cd file-diff-cli && go mod tidy  
 
