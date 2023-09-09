@@ -2,7 +2,7 @@
 
 [中文](readme-CN.md)
 
-## What is it
+## 1. What is it
 
 `FileDiffGrouper` is a command line tool for comparing file differences between two directories. It compares all files in the two directories byte-by-byte based on content, rather than filenames. Although only tested on Windows 10/11, it does not use any OS-specific features, so theoretically can run on Linux and MacOS as well.
 
@@ -13,7 +13,7 @@
 
 `FileDiffGrouper` can optionally move the files in the MORE and SAME sets to specified backup directories, based on options. For safety, it does not provide functionality to automatically delete these files.
 
-## What to solve
+## 2. What to solve
 
 There are many software tools that provide functionality to compare file differences between two directories and find duplicate files, such as:
 
@@ -34,7 +34,7 @@ Backing up data is a relatively professional job. For most people, it is difficu
 
 > FileDiffGrouper only finds duplicate and extra files in Target relative to Base. It does not deduplicate Base itself. Please use the tools listed above to deduplicate Base first. Of course, it is recommended to also deduplicate Target before using this tool, to improve efficiency.
 
-## Install
+## 3. Install
 
 3 way to install file difference grouper：
 
@@ -51,9 +51,9 @@ On Windows, the executable filename is `fdg.exe`, around 6MB in size.
 
 In addition to the executable file, a sample config file is also provided: config.yaml.
 
-## Usage
+## 4. Usage
 
-### Command line
+### 4.1 Command line
 
 Executing the `fdg` command is simple - just provide the full path to the configuration file.
 
@@ -76,7 +76,7 @@ Usage:
   otherwise: show this help.
 ```
 
-### Configuration
+### 4.2 Configuration
 
 Since there are many parameters to specify, command line arguments are not used. Instead, a configuration file is used. The configuration file can be in formats supported by [viper](http://github.com/spf13/viper%7Cgithub.com/spf13/viper) such as `.json`, `.xml,` `.yml` and `.toml`. The example below uses `.yaml`. Please refer to the comments.
 
@@ -166,9 +166,9 @@ filter:
   maxFileSize: 0
 ```
 
-### How it works and parameter descriptions
+### 4.3 How it works and parameter descriptions
 
-#### How it works
+#### 4.3.1 How it works
 
 `fdg` traverses the directories specified in `compareBase.dir` and `compareTarget.dir`, and finds identical files (duplicate files) between them, as well as files that exist in Target but not in Base (extra files).
 
@@ -181,7 +181,7 @@ filter:
 
 Currently the CRC32 algorithm is used, which should be sufficient.
 
-#### headerSize & bufferSize
+#### 4.3.2 headerSize & bufferSize
 
 In order to calculate file checksums, the binary contents of each file needs to be read. Reading the entire contents of all files would take too much time, so `headerSize` is defined. For example, if there are 100 files of 1GB each, and `needFullChecksum` is set to true, 100GB of data will be read. If set to false and `headerSize` is 1024 bytes, only 100KB of data will be read, which is much faster.
 
@@ -189,7 +189,7 @@ In order to calculate file checksums, the binary contents of each file needs to 
 
 `bufferSize` defines the buffer size for file IO, to improve speed. If `bufferSize` is smaller than headerSize, it will be automatically adjusted to the value of `headerSize`.
 
-#### needFullChecksum
+#### 4.3.3 needFullChecksum
 
 The checksum of the file header is called `headerChecksum`. If two files have the same length and `headerChecksum`, then their full file checksums `fullChecksum` need to be compared further.
 
@@ -199,7 +199,7 @@ Setting `needFullChecksum` to true is useful in the scenario where there is a la
 
 > For example, I have a USB drive with about 50,000 files totaling 300GB. After scanning it with `needFullChecksum` set to true and getting the result file `result.json`, I can then compare files on the USB drive with others using only `result.json` without connecting the USB drive.
 
-#### loadScanResult & scanResultFile
+#### 4.3.4 loadScanResult & scanResultFile
 
 Each comparison is based on the scan results of the two directories. The scan results are saved to a file defined by `scanResultFile`. If this value is an empty string, no scan result file will be output.
 
@@ -279,7 +279,7 @@ The scan results are saved in `JSON` format, with content like below:
 }
 ```
 
-#### backupDir
+#### 4.3.5 backupDir
 
 Since the program is designed for cases with extremely large numbers of files, automatic deletion of duplicate files is not provided to avoid hard-to-recover mistakes. Instead, duplicate and extra files are moved to the specified directory for manual confirmation and deletion by the user.
 
@@ -328,7 +328,7 @@ Before the separator line `----------`, comparison result information is saved i
 
 After the separator line, each line is the absolute path filename.
 
-#### moveMore & moveSame
+#### 4.3.6 moveMore & moveSame
 
 `moveMore` and `moveSame` specify whether to move the corresponding files to `backupDir`.
 The program will create a directory named like `YYYYMMDD_HHMMSS` under `backupDir` based on current time, and then create `more` and `same` directories under it, for extra and duplicate files respectively.
@@ -339,7 +339,7 @@ Here `20230907_123456` represents the execution time, which is `2023-09-07 12:34
 
 The timestamped directory under `backupDir` isolates the result from multiple runs. The `more` and `same` subdirectories categorize the extra and duplicate files. Keeping the original structure helps identify where the files came from. This organization of the moved files aims to facilitate manual review and cleanup.
 
-#### filter
+#### 4.3.7 filter
 
 `filter` defines the conditions to filter files. The comments in the config file have explained it clearly. Here are some additional notes:
 
