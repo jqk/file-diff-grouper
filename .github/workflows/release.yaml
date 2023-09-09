@@ -23,11 +23,11 @@ jobs:
             # 因为不同平台用的内容相同，所以也可以使用 env 定义在外层，但集中一起更直观。
             artifactname: "fdc"
             goarch: amd64
-        #   - goos: linux
-        #     artifactext: ""
-        #     os: ubuntu-latest
-        #     artifactname: "fdc"
-        #     goarch: amd64
+          - goos: linux
+            artifactext: ""
+            os: ubuntu-latest
+            artifactname: "fdc"
+            goarch: amd64
 
     steps:
       - name: Get Tag Version
@@ -65,13 +65,13 @@ jobs:
       - name: Packaging
         # 即使在 windows 中执行 github action，也不需要提前安装 zip/tar，已内置。
         # 以下针对 program_version 的警告可忽略，只要保证前面确实在环境变量中有所定义。
+        # 注意最后将 config.yaml 也打入包中。
         run: |
             cd file-diff-cli
-            zip -r ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ env.program_version }}.zip ${{ matrix.artifactname }}${{ matrix.artifactext }}
+            zip -r ${{ matrix.artifactname }}-${{ matrix.goos }}-${{ matrix.goarch }}-${{ env.program_version }}.zip ${{ matrix.artifactname }}${{ matrix.artifactext }} config.yaml
 
       - name: Create GitHub release from tag
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            file-diff-cli/config.yaml
             file-diff-cli/*.zip
