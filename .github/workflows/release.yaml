@@ -47,7 +47,7 @@ jobs:
         run: pwd && cd file-diff && pwd && go mod tidy
 
       - name: Update mod in file-diff-cli
-        run: pwd && cd file-dif-clif && pwd && go mod tidy
+        run: pwd && ls && cd file-dif-cli && pwd && go mod tidy
 
       - name: Setup Go
         uses: actions/setup-go@v3
