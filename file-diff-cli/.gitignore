@@ -1,0 +1,41 @@
+# Binaries 
+*.exe 
+*.dll
+*.so  
+*.o
+*.a
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of `go install`
+*.out  
+
+# Dist drop  
+/dist   
+
+# IDEs and editors  
+/.idea
+.project
+.classpath   
+
+# For go modules, ignore .cache and anything in a .cache directory
+**/.cache 
+
+# Temp files
+*~
+*.bak
+*.swp
+*.tmp
+
+# Go-specific
+*.test
+*.prof
+
+go.sum
+
+# Folders
+_obj
+_test
+vendor

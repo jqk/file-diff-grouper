@@ -1,0 +1,44 @@
+# 各个属性的意义，见 config.Yaml 中的注释。
+# 本文件只说明与测试逻辑相关的属性。
+
+# 与正面的 needFullChecksum 配合，当文件小于 HeaderSize 时，
+# 即使 needFullChecksum 为 false，也将计算整体文件摘要。
+headerSize: 2000
+bufferSize: 10240
+
+# 待执行的操作，字符串，大小写不敏感，只能是以下三类之一：
+# Compare：比较 compareBase 和 compareTarget。
+# ScanBase：仅扫描 compareBase。
+# ScanTarget：仅扫描 compareTarget。
+action: "Compare"
+
+compareBase:
+  dir: "test-data/origin/compare_base"
+  scanResultFile: "test-data/output/scan-test-base.scan.json"
+  loadScanResult: false
+  # 不要求计算文件摘要。
+  needFullChecksum: false
+
+compareTarget:
+  dir: "test-data/origin/compare_target"
+  # 测试不保存结果文件。
+  scanResultFile: ""
+  loadScanResult: false
+  # 要求计算文件摘要。
+  needFullChecksum: true
+
+  backupDir: "test-data/output"
+  moveMore: false
+  moveSame: false
+
+filter:
+  caseSensitive: false
+  include:
+    - "*.txt"
+    - "*.md"
+  exclude:
+    - "*.logg"
+  # 有些文件小于 1024 字节，被过滤。如 size_too_small.txt。
+  minFileSize: 1024
+  # 有些文件小于 3072 字节，被过滤。如 size_too_large.txt 和 013.md。
+  maxFileSize: 3072
