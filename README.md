@@ -75,62 +75,62 @@ Since there are many parameters to specify, command line arguments are not used.
 You don't need to read through in detail at first. Each parameter in the configuration file will be explained in more detail in the `How It Works and Parameter Descriptions` section.
 
 ```yaml {.line-numbers}
-# 快速扫描时读取各个文件头用于计算摘要的字节长度。
+# The number of bytes read from each file header for calculating checksum during quick scan. 
 headerSize: 1024
-# 文件读取缓冲区字节长度，必须大于等于 HeaderSize。
+# The buffer size in bytes for reading files. It must be greater than or equal to HeaderSize. 
 bufferSize: 10240
 
-# 待执行的操作，大小写不敏感，只能是以下三种之一：
-# - Compare：比较 compareBase 和 compareTarget。
-# - ScanBase：仅扫描 compareBase。
-# - ScanTarget：仅扫描 compareTarget。
+# Action to perform, case insensitive, must be one of: 
+# - Compare: Compare compareBase and compareTarget.
+# - ScanBase: Only scan compareBase.
+# - ScanTarget: Only scan compareTarget. 
 action: "Compare"
 
-# 待比较的基准路径信息。
+# Base path information for comparison.
 compareBase:
-  # 待比较的文件所在路径。可以是只读的。
+  # Compare base path. Can be read-only. 
   dir: "z:/compare_base"
-  # 保存扫描结果的文件名，必须是可写的。
-  # 可以指定相对或绝对路径文件名。也可以通过 ${dir} 引用 dir 定义的路径。
-  scanResultFile: "z:/result/base.scan.json"
-  # 是否直接装载以前的扫描结果的文件，以提高速度，避免每次重复扫描。
-  # 在上一次扫描到本次扫描之间，待比较路径中的文件可能有增、删等变化。
-  # 这要由用户自行决定是否装载以前的扫描结果以提高效率。程序不会自动关注可能存在的变化。
-  # 如果为 true，但文件不存在，则会进行扫描。
+  # Filename to save the scan result.
+  # Can be a relative or absolute path. Can also reference the path defined above using ${dir}. 
+  # It equals to 'z:/compare_base/base.scan.json' below.
+  scanResultFile: "${dir}/base.scan.json"
+  # Whether to load previous scan result file to improve speed, avoiding rescanning every time.
+  # Files in the compare paths may have changed (added, deleted etc) since last scan.
+  # It's up to the user to decide whether to load previous result to improve efficiency.
+  # The program does not automatically handle potential changes.
+  # If set to true but the file does not exist, scanning will be performed. 
   loadScanResult: true
-  # 是否对待比较的文件进行整个文件摘要的计算。为 false 计算文件头的摘要值。 
+  # Whether to compute full file digests for the files being compared. 
+  # False means computing digest of file header only.
   needFullChecksum: false
 
 # 待比较的目标路径信息。
 compareTarget:
-  # 比较目标路径，如果不做下面设定的 moveMore 和 moveSame 操作，可以是只读的。否则，必须是可写的。
+  # Compare target path. Can be read-only if not doing moveMore and moveSame operations below. 
+  # Otherwise must be writable.
   dir: "z:/compare_target"
-  # 保存扫描结果的文件名，必须是可写的。
-  # 可以指定相对或绝对路径文件名。也可以通过 ${dir} 引用 dir 定义的路径。
-  # 如以下路径等同于 "z:/compare_target/target.scan.json"。
-  scanResultFile: "${dir}/target.scan.json"
-  # 是否直接装载以前的扫描结果的文件，以提高速度，避免每次重复扫描。
-  # 在上一次扫描到本次扫描之间，待比较路径中的文件可能有增、删等变化。
-  # 这要由用户自行决定是否装载以前的扫描结果以提高效率。程序不会自动关注可能存在的变化。
-  # 如果为 true，但文件不存在，则会进行扫描。
+  # Same as attributes defined in compareBase.
+  scanResultFile: "z:/result/target.scan.json"
   loadScanResult: true
-  # 是否对待比较的文件进行整个文件摘要的计算。为 false 计算文件头的摘要值。 
   needFullChecksum: false
 
-  # 保存比较结果的路径，必须是可写的。而且，必需是无需复制，能直接从 dir 移动文件的路径。
-  # 可以指定相对或绝对路径。也可以通过 ${dir} 引用 dir 定义的路径。
+  # Path to save the comparison results, must be writable. 
+  # Can be a relative or absolute path. Can also reference the path defined in above using ${dir}.
   backupDir: "z:/result/group"
-  # 是否将 target 比 base 多的文件移动到比较结果目录中。为 false 只生成结果文件列表。
+  # Whether to move files in target but not in base to the compare result dir. 
+  # False means only generating a result file list.
   moveMore: false
-  # 是否将 target 和 base 相同的文件移动到比较结果目录中。为 false 只生成结果文件列表。
+  # Whether to move files that exist in both target and base to the compare result directory.
+  # False means only generating a result file list.
   moveSame: false
 
-# 选择待比较文件的过滤条件。
+# Filter criteria for selecting files to compare.
 filter:
-  # 扩展名是否大小写敏感。
+  # Whether to be case sensitive for file extensions.
   caseSensitive: false
-  # 包含的文件扩展名。必须提供至少一个有效的字符串的条件。空字符串表示没有扩展名的文件。
-  # 本例中的 include 是手机、相机中主要的图片、视频扩展名。
+  # File extensions to include. Must provide condition(s) with at least one valid string. 
+  # Empty string means files without extension.
+  # The include in this example covers major image and video extensions for phones and cameras.
   include:
     - "*.3gp" 
     - "*.amr" 
@@ -146,14 +146,15 @@ filter:
     - "*.webp"
     - "*.wmv" 
 
-  # 排除的文件扩展名，可以不提供。
+  # File extensions to exclude, can be left empty.
   exclude:
     - "*.log"
 
-  # 文件字节最小长度小于等于 0 表示不限制，但至少会从 1 字节开始，0 字节不处理。
+  # Minimum file size in bytes, 0 or less means no limit, 
+  # but will process starting from 1 byte, 0 byte files are skipped.
   minFileSize: 1024
 
-  # 文件字节最大长度小于等于 0 表示不限制。
+  # Maximum file size in bytes, 0 or less means no limit.
   maxFileSize: 0
 ```
 
@@ -161,7 +162,7 @@ filter:
 
 #### How it works
 
-`fdg` traverses the directories specified in `compareBase.dir` and `compareTarget.dir`, and finds identical files (duplicate files) between them, as well as files that exist in Target but not in Base (extra files). 
+`fdg` traverses the directories specified in `compareBase.dir` and `compareTarget.dir`, and finds identical files (duplicate files) between them, as well as files that exist in Target but not in Base (extra files).
 
 `fdg` does not compare filenames of the two files, but rather compares the file sizes and contents:
 
@@ -171,3 +172,172 @@ filter:
 `fdg` first scans all files under `compareBase.dir` and `compareTarget.dir` including subdirectories, to get two scan result sets containing file sizes and checksums. It then compares the records in the two scan results based on the rules above to determine duplicate and extra files.
 
 Currently the CRC32 algorithm is used, which should be sufficient.
+
+#### headerSize & bufferSize
+
+In order to calculate file checksums, the binary contents of each file needs to be read. Reading the entire contents of all files would take too much time, so `headerSize` is defined. For example, if there are 100 files of 1GB each, and `needFullChecksum` is set to true, 100GB of data will be read. If set to false and `headerSize` is 1024 bytes, only 100KB of data will be read, which is much faster.
+
+`headerSize` should not be set too large, 1024 to 10240 is recommended. If `headerSize` is set smaller than 1024, it will be automatically adjusted to 1024 by the program.
+
+`bufferSize` defines the buffer size for file IO, to improve speed. If `bufferSize` is smaller than headerSize, it will be automatically adjusted to the value of `headerSize`.
+
+#### needFullChecksum
+
+The checksum of the file header is called `headerChecksum`. If two files have the same length and `headerChecksum`, then their full file checksums `fullChecksum` need to be compared further.
+
+If `fullChecksum` is not calculated, `fdg` will automatically calculate and save it in the scan result file. So in most cases, `needFullChecksum` can be set to false. `fdg` will automatically supplement the calculation as needed.
+
+Setting `needFullChecksum` to true is useful in the scenario where there is a large directory that needs to be compared repeatedly with other directories. To avoid rescanning the directory every time, its complete scan result can be obtained once, and in subsequent runs `loadScanResult` can be set to true to save scanning time.
+
+> For example, I have a USB drive with about 50,000 files totaling 300GB. After scanning it with `needFullChecksum` set to true and getting the result file `result.json`, I can then compare files on the USB drive with others using only `result.json` without connecting the USB drive.
+
+#### loadScanResult & scanResultFile
+
+Each comparison is based on the scan results of the two directories. The scan results are saved to a file defined by `scanResultFile`. If this value is an empty string, no scan result file will be output.
+
+If `loadScanResult` is true and the file defined by `scanResultFile` exists, the scan results in that file will be loaded to save scanning time. Otherwise, scanning will be performed.
+
+The scan results are saved in `JSON` format, with content like below:
+
+```json {.line-numbers}
+{
+    "HeaderSize": 2000,
+    "Dir": "test-data/origin/compare_base",
+    "Filter": {
+        "CaseSensitive": false,
+        "Include": [
+            "*.md",
+            "*.txt"
+        ],
+        "Exclude": [
+            "*.log"
+        ],
+        "MinFileSize": 1024,
+        "MaxFileSize": 3072
+    },
+    "FileCount": 5,
+    "FileSize": 9668,
+    "HeaderChecksumCount": 3,
+    "FullChecksumCount": 4,
+    "ElapsedTime": 1050700,
+    "Files": {
+        "3096586316": [
+            {
+                "HeaderChecksum": 3096586316,
+                "HasFullChecksum": true,
+                "FullChecksum": 3096586316,
+                "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\004.txt",
+                "FileSize": 1588,
+                "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
+            }
+        ],
+        "3222652411": [
+            {
+                "HeaderChecksum": 3222652411,
+                "HasFullChecksum": false,
+                "FullChecksum": 0,
+                "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\001.md",
+                "FileSize": 2278,
+                "ModifiedTime": "2023-06-30T12:57:32.2260055+08:00"
+            }
+        ],
+        "4245835769": [
+            {
+                "HeaderChecksum": 4245835769,
+                "HasFullChecksum": true,
+                "FullChecksum": 4245835769,
+                "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\dir_0\\002.txt",
+                "FileSize": 1934,
+                "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
+            },
+            {
+                "HeaderChecksum": 4245835769,
+                "HasFullChecksum": true,
+                "FullChecksum": 4245835769,
+                "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\dir_0\\dir_1\\003-same-as-002.md",
+                "FileSize": 1934,
+                "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
+            },
+            {
+                "HeaderChecksum": 4245835769,
+                "HasFullChecksum": true,
+                "FullChecksum": 4245835769,
+                "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\dir_0\\dir_1\\copy-of-003.md",
+                "FileSize": 1934,
+                "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
+            }
+        ]
+    }
+}
+```
+
+#### backupDir
+
+Since the program is designed for cases with extremely large numbers of files, automatic deletion of duplicate files is not provided to avoid hard-to-recover mistakes. Instead, duplicate and extra files are moved to the specified directory for manual confirmation and deletion by the user.
+
+`backupDir` specifies where to move the duplicate and extra files found. This value must be a valid writable path that has ***movable*** relationship with `compareTarget.dir`. After comparison, two result files will be kept in this directory:
+
+- target-more-than-base.txt
+- target-same-with-base.txt
+
+It's obvious that `backupDir` must be writable. The requirement that it must be ***movable*** needs emphasis. Here "movable" means moving can be done without copying the file content. For example on Windows, moving `c:\doc\a.txt` to `c:\backup\a.txt` is extremely fast, without actually reading/writing the file content itself - it's similar to renaming the file. But moving it to `d:\doc\a.txt` would require first reading all content from `c:\doc\a.txt`, writing it to `d:\doc\a.txt`, and finally deleting `c:\doc\a.txt`. Considering there may be a huge number of large files, this would involve massive IO and waste time. Therefore, ***backupDir must have this kind of movable relationship with compareTarget.dir***.
+
+The two result files have the same structure, for example:
+
+```text {.line-numbers}
+{
+    "BaseDir": "test-data/origin/compare_base",
+    "BaseFileCount": 6,
+    "BaseHeaderChecksumCount": 4,
+    "TargetDir": "test-data/origin/compare_target",
+    "TargetFileCount": 3,
+    "TargetHeaderChecksumCount": 3,
+    "Filter": {
+        "CaseSensitive": false,
+        "Include": [
+            "*.md",
+            "*.txt"
+        ],
+        "Exclude": [
+            "*.log"
+        ],
+        "MinFileSize": 1024,
+        "MaxFileSize": 1048576
+    },
+    "CompareResultType": "more",
+    "ResultFileCount": 2,
+    "ResultFileSize": 35879,
+    "ElapsedTime": 0
+}
+
+----------
+
+"e:\github\jqk\file-diff-grouper\file-diff\test-data\origin\compare_target\013.md"
+"e:\github\jqk\file-diff-grouper\file-diff\test-data\origin\compare_target\dir\011.txt"
+```
+
+Before the separator line `----------`, comparison result information is saved in JSON format. The meaning can be understood from the field names.
+
+After the separator line, each line is the absolute path filename.
+
+#### moveMore & moveSame
+
+`moveMore` and `moveSame` specify whether to move the corresponding files to `backupDir`.
+The program will create a directory named like `YYYYMMDD_HHMMSS` under `backupDir` based on current time, and then create `more` and `same` directories under it, for extra and duplicate files respectively.
+
+The original directory structure will be kept when moving the files. For example, if `target/a/b.txt` is a duplicate file, it will be moved to `backupDir/20230907_123456/same/a/b.txt`. This makes it convenient to manually compare and locate the original files.
+
+Here `20230907_123456` represents the execution time, which is `2023-09-07 12:34:56.`
+
+The timestamped directory under `backupDir` isolates the result from multiple runs. The `more` and `same` subdirectories categorize the extra and duplicate files. Keeping the original structure helps identify where the files came from. This organization of the moved files aims to facilitate manual review and cleanup.
+
+#### filter
+
+`filter` defines the conditions to filter files. The comments in the config file have explained it clearly. Here are some additional notes:
+
+- If the same extension appears in both `include` and `exclude`, those files will be skipped. This is because `exclude` is processed first.
+- An empty string means files without any extension.
+
+How to find out what file extensions exist in a directory? You can use a small tool called [file-extension-counter](https://github.com/jqk/FileExtensionCounter), only 3MB in size.
+
+**Enjoy**!

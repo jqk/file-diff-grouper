@@ -174,7 +174,9 @@ filter:
 
 #### 4.3.2 headerSize 和 bufferSize
 
-为了得到文件的校验和，必需读取文件的二进制内容进行计算。而读取所有文件的整个文件内容，将耗费太多时间，因此定义了 `headerSize`。例如有 100 个 1GB 的文件，如果 `needFullChecksum` 设置为 true，将读取 100GB 的数据；而将其设为 false，并设置 `headerSize` 为 1024 字节，则仅需读取 100KB 的数据。后者速度要远远高于前者。`headerSize` 不易设得过大，建议为 1024 到 10240。如果 `headerSize` 设置小于 1024，程序会自动将其调整为 1024。
+为了得到文件的校验和，必需读取文件的二进制内容进行计算。而读取所有文件的整个文件内容，将耗费太多时间，因此定义了 `headerSize`。例如有 100 个 1GB 的文件，如果 `needFullChecksum` 设置为 true，将读取 100GB 的数据；而将其设为 false，并设置 `headerSize` 为 1024 字节，则仅需读取 100KB 的数据。后者速度要远远高于前者。
+
+`headerSize` 不易设得过大，建议为 1024 到 10240。如果 `headerSize` 设置小于 1024，程序会自动将其调整为 1024。
 
 `bufferSize` 定义的是读文件缓冲区的长度，以提高 IO 速度。如果 `bufferSize` 小于 `headerSize`，程序会自动将其调整为 `headerSize` 的值。
 
