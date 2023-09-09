@@ -1,6 +1,6 @@
 # File Diff Grouper
 
-[English](readme.md)
+[English](README.md)
 
 ## 一、 功能
 
