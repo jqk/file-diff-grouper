@@ -1,31 +1,32 @@
-   {
-       "folders": [
-           {
-               "path": "."
-           }
-       ],
-       "launch": {
-           "configurations": [
-               {
-                   "name": "file-diff",
-                   "type": "go",
-                   "request": "launch",
-                   "mode": "auto",
-                   "program": "${workspaceFolder:file-diff}",
-                   "env": {},
-                   "showLog": true
-               },
-               {
-                   "name": "cli",
-                   "type": "go",
-                   "request": "launch",
-                   "mode": "auto",
-                   "program": "${workspaceFolder:file-diff-cli}",
-                   "env": {},
-                   // "args": ["-c","z://config.yaml"],
-                   "args": ["-t","e:/temp"],
-                   "showLog": true
-               }
-           ]
-       }
-   }
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "launch": {
+    "configurations": [
+      {
+        "name": "file-diff",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder:file-diff}",
+        "env": {},
+        "showLog": true
+      },
+      {
+        "name": "file-diff-cli",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        // "program": "${workspaceFolder:file-diff-cli}" 这种形式不行。
+        "program": "${workspaceFolder}/file-diff-cli",
+        "env": {},
+        //"args": [],
+        "args": ["config.yaml"],
+        "showLog": true
+      }
+    ]
+  }
+}
