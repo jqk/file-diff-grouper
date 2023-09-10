@@ -12,16 +12,17 @@ import (
 func showVersion() {
 	fmt.Println()
 	fmt.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
-	fmt.Println("file difference grouper (fdg) 1.0.0, 2023-09-08")
+	fmt.Println("file difference grouper (fdg) 1.0.1, 2023-09-11")
 	fmt.Println()
 }
 
 func showHelp() {
 	fmt.Println("Usage:")
-	fmt.Println("  fdg [path/to/the/taskConfigFile]")
+	fmt.Println("  fdg [path/to/configFile]")
 	fmt.Println("      Compare and group the file differences according to specified config file.")
 	fmt.Println()
 	fmt.Println("  otherwise: show this help.")
+	fmt.Println("  see <https://github.com/jqk/file-diff-grouper> for more information.")
 	fmt.Println()
 }
 
