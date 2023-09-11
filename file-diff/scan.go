@@ -67,7 +67,7 @@ func ScanDir(config *DirConfig) (*ScanResult, error) {
 	stopwatch := timeutils.Stopwatch{}
 	stopwatch.Start()
 
-	err = config.Filter.GetEachFile(config.Dir, true, func(path string, info os.FileInfo) error {
+	err = config.Filter.GetEachFile(config.Dir, nil, func(path string, info os.FileInfo) error {
 		// 因为 GetEachFile() 调用本代码给出的 path 必然是有效的，所以 Abs() 不会返回错误，也就不必处理。
 		filename, _ := filepath.Abs(path)
 		identity, e := getFileIdentity(filename, config.HeaderSize, buffer, config.NeedFullChecksum)

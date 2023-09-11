@@ -22,7 +22,7 @@ func TestGroupFileDiff(t *testing.T) {
 	// 从 origin 中复制整个 target 目录到 output 中。
 	baseParent := filepath.Dir(config.CompareBase.Dir)
 	targetSource := filepath.Join(baseParent, "compare_target")
-	err = fileutils.CopyDir(targetSource, config.CompareTarget.Dir)
+	err = fileutils.CopyDir(targetSource, config.CompareTarget.Dir, nil)
 	assert.Nil(t, err)
 
 	// 移动文件。

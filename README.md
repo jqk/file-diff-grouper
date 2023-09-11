@@ -67,13 +67,14 @@ There are no specific requirements for the configuration filename itself, but it
 $ fdg
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file difference grouper (fdg) 1.0.0, 2023-09-07
+file difference grouper (fdg) 0.9.0, 2023-09-11
 
 Usage:
   fdg [path/to/the/taskConfigFile]
       Compare and group the file differences according to specified config file.
 
-  otherwise: show this help.
+Otherwise: show this help.
+See <https://github.com/jqk/file-diff-grouper> for more information.
 ```
 
 ### 4.2 Configuration
