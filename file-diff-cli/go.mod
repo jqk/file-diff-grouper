@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	file-diff v0.0.0
-	github.com/jqk/futool4go v1.4.0
+	github.com/jqk/futool4go v1.4.1
 )
 
 require (

@@ -67,7 +67,7 @@ fdg c:\test\config.yaml
 $ fdg
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file difference grouper (fdg) 0.9.0, 2023-09-11
+file difference grouper (fdg) 0.9.1, 2023-09-13
 
 Usage:
   fdg [path/to/the/taskConfigFile]

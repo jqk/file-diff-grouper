@@ -1,6 +1,7 @@
 package filediff
 
 import (
+	"fmt"
 	"hash/crc32"
 	"os"
 	"path/filepath"
@@ -72,7 +73,7 @@ func ScanDir(config *DirConfig) (*ScanResult, error) {
 		filename, _ := filepath.Abs(path)
 		identity, e := getFileIdentity(filename, config.HeaderSize, buffer, config.NeedFullChecksum)
 		if e != nil {
-			return e
+			return fmt.Errorf("%s: %s", e, filename)
 		}
 
 		result.FileSize += identity.FileSize

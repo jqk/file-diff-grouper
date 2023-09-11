@@ -12,7 +12,7 @@ import (
 func showVersion() {
 	fmt.Println()
 	fmt.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
-	fmt.Println("file difference grouper (fdg) 0.9.0, 2023-09-11")
+	fmt.Println("file difference grouper (fdg) 0.9.1, 2023-09-13")
 	fmt.Println()
 }
 

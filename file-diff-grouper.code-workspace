@@ -11,7 +11,8 @@
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceFolder:file-diff}",
+        // "program": "${workspaceFolder:file-diff}" 这种形式不行。
+        "program": "${workspaceFolder}/file-diff",
         "env": {},
         "showLog": true
       },
@@ -24,7 +25,7 @@
         "program": "${workspaceFolder}/file-diff-cli",
         "env": {},
         //"args": [],
-        "args": ["config.yaml"],
+        "args": ["e:/temp/fdg/config-h-160bak.yaml"],
         "showLog": true
       }
     ]
