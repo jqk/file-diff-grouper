@@ -25,28 +25,22 @@ func main() {
 		var groupResult *filediff.GroupResult = nil
 		var scanBaseResult *filediff.ScanResult = nil
 		var scanTargetResult *filediff.ScanResult = nil
-		count := 0
+		lastCount := 0
 		done := make(chan struct{}) // 用于协程同步的通道。
 
 		go func() { // 启动单独的协程执行任务。
 			if strings.EqualFold(config.Action, filediff.ActionCompare) {
-				groupResult, err = filediff.GroupFileDiff(config, func(fileIdentity *filediff.FileIdentity) {
-					count++
-				})
+				groupResult, err = filediff.GroupFileDiff(config, fileScanedHandler)
 				if err != nil {
 					showError("Group files error", err, false)
 				}
 			} else if strings.EqualFold(config.Action, filediff.ActionScanBase) {
-				scanBaseResult, err = filediff.ScanBaseDir(config, func(fileIdentity *filediff.FileIdentity) {
-					count++
-				})
+				scanBaseResult, err = filediff.ScanBaseDir(config, fileScanedHandler)
 				if err != nil {
 					showError("ScanBaseDir error", err, false)
 				}
 			} else if strings.EqualFold(config.Action, filediff.ActionScanTarget) {
-				scanTargetResult, err = filediff.ScanTargetDir(config, func(fileIdentity *filediff.FileIdentity) {
-					count++
-				})
+				scanTargetResult, err = filediff.ScanTargetDir(config, fileScanedHandler)
 				if err != nil {
 					showError("ScanTargetDir error", err, false)
 				}
@@ -56,7 +50,7 @@ func main() {
 		}()
 
 		// 等待扩展名扫描结束。并显示扩展名扫描进度。
-		sleepTime := 500 * time.Millisecond
+		sleepTime := 800 * time.Millisecond
 		for {
 			time.Sleep(sleepTime)
 
@@ -75,11 +69,25 @@ func main() {
 				}
 				return
 			default: // 打印扫描进度。
-				showScanProgress(count)
+				if lastCount != countOfFiles {
+					// 避免扫描未一文件时卡住，如 IO 等待，或文件很大时，造成重复显示同一数量。
+					lastCount = countOfFiles
+					showScanProgress(countOfFiles)
+				}
 			}
 		}
 	} else {
 		showError("Argument error", errors.New("wrong number of argument"), true)
 		os.Exit(1)
+	}
+}
+
+var lastFileIdentity *filediff.FileIdentity = nil // 暂时不知有什么用，先保留。
+var countOfFiles = 0
+
+func fileScanedHandler(fileIdentity *filediff.FileIdentity) {
+	if lastFileIdentity == nil || lastFileIdentity.Filename != fileIdentity.Filename {
+		lastFileIdentity = fileIdentity
+		countOfFiles++
 	}
 }

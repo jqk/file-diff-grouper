@@ -120,10 +120,8 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 getFileIdentity 通过计算文件的整体校验和来获取文件的标识信息。
 */
 func getFileIdentity(filename string, headerSize int, buffer []byte, needFullChecksum bool) (*FileIdentity, error) {
-
-	// 使用 crc32 作为校验和算法。
-	crc := crc32.NewIEEE()
-	sumFunc := crc.Sum32
+	crc := crc32.NewIEEE() // 使用 crc32 作为校验和算法。仅需改变此处的 hash 及取得最后结果的函数引用即可。
+	sumFunc := crc.Sum32   // 注意函数必须是前面建立的 hash 对象的函数引用。
 	provider := fileutils.NewCommonFileChecksumProvider[uint32](crc, sumFunc)
 
 	if err := fileutils.GetFileChecksumWithProvider[uint32](
