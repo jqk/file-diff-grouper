@@ -88,5 +88,9 @@ func splitFilename(filename string) (string, string, string) {
 	name := file[:lastDot]
 	ext := file[lastDot+1:]
 
+	if dir == "" {
+		dir = "./" // viper 装载文件时，dir 为空字符会找不到文件。
+	}
+
 	return dir, name, ext
 }
