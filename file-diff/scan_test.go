@@ -11,11 +11,13 @@ func TestScanDir(t *testing.T) {
 	assert.NotNil(t, config)
 	assert.Nil(t, err)
 
+	fileIdentities = fileIdentities[:0]
 	base, target := getDirConfig(config)
-	result, err := ScanDir(base)
+	result, err := ScanDir(base, fileScanedHandler)
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 
+	assert.Equal(t, len(fileIdentities), result.FileCount)
 	assert.Equal(t, 5, result.FileCount)
 	// 有 4 个文件长度小于 headerSize，所以直接算是有了 fullChecksum。
 	assert.Equal(t, 4, result.FullChecksumCount)
@@ -38,7 +40,15 @@ func TestScanDir(t *testing.T) {
 
 	// 也执行一下 target。但因为 target.ScanResultFile 是空字符串，所以
 	// 不会保存结果文件。
-	result, err = ScanDir(target)
+	fileIdentities = fileIdentities[:0]
+	result, err = ScanDir(target, fileScanedHandler)
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
+	assert.Equal(t, len(fileIdentities), result.FileCount)
+}
+
+var fileIdentities = make([]*FileIdentity, 10)
+
+func fileScanedHandler(id *FileIdentity) {
+	fileIdentities = append(fileIdentities, id)
 }

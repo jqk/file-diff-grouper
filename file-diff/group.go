@@ -30,14 +30,14 @@ Returns:
   - [GroupResult] object.
   - If an error occurs during the comparison process.
 */
-func GroupFileDiff(config *Config) (*GroupResult, error) {
+func GroupFileDiff(config *Config, handler FileScanedFunc) (*GroupResult, error) {
 	result := &GroupResult{}
 	var err error
 	stopwatch := &t.Stopwatch{}
 	stopwatch.Start()
 
 	// 先比较两个目录。获得相同的，和多出的文件列表。
-	result.More, result.Same, err = CompareDirs(config)
+	result.More, result.Same, err = CompareDirs(config, handler)
 	if err != nil {
 		return nil, err
 	}

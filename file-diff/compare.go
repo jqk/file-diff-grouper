@@ -23,16 +23,16 @@ Returns:
   - CompareResult pointers containing the result of files in both target dir and base dir.
   - If an error occurs during the comparison process.
 */
-func CompareDirs(config *Config) (resultMore *CompareResult, resultSame *CompareResult, err error) {
+func CompareDirs(config *Config, handler FileScanedFunc) (resultMore *CompareResult, resultSame *CompareResult, err error) {
 	baseConfig, targetConfig := getDirConfig(config)
 	var baseScanResult, targetScanResult *ScanResult
 	var more, same *FileGroup
 
 	// 获取两个目录的扫描结果。根据配置定义，有可能是装载以前的扫描结果，也有可能是新的扫描结果。
-	if baseScanResult, err = getScanResult(baseConfig); err != nil {
+	if baseScanResult, err = getScanResult(baseConfig, handler); err != nil {
 		return nil, nil, err
 	}
-	if targetScanResult, err = getScanResult(targetConfig); err != nil {
+	if targetScanResult, err = getScanResult(targetConfig, handler); err != nil {
 		return nil, nil, err
 	}
 
@@ -86,7 +86,7 @@ func CompareDirs(config *Config) (resultMore *CompareResult, resultSame *Compare
 }
 
 // getScanResult 获取扫描结果。根据配置定义，有可能是装载以前的扫描结果，也有可能是新的扫描结果。
-func getScanResult(config *DirConfig) (scanResult *ScanResult, err error) {
+func getScanResult(config *DirConfig, handler FileScanedFunc) (scanResult *ScanResult, err error) {
 	if config.LoadScanResult {
 		// 按指定读取以前的扫描结果文件。
 		scanResult, err = LoadScanResult(config.ScanResultFile)
@@ -109,7 +109,7 @@ func getScanResult(config *DirConfig) (scanResult *ScanResult, err error) {
 	if scanResult == nil {
 		// 本条件成立，说明要么 config.LoadScanResult 为 false，
 		// 要么以前的扫描结果文件不存在，需重新执行扫描。
-		if scanResult, err = ScanDir(config); err != nil {
+		if scanResult, err = ScanDir(config, handler); err != nil {
 			return nil, err
 		}
 	}

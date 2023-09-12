@@ -10,6 +10,8 @@ import (
 	"github.com/jqk/futool4go/timeutils"
 )
 
+type FileScanedFunc func(*FileIdentity)
+
 /*
 ScanTargetDir scans the directory specified in the config parameter and save the result.
 
@@ -20,9 +22,9 @@ Returns:
   - [ScanResult] object.
   - an error if any.
 */
-func ScanBaseDir(config *Config) (*ScanResult, error) {
+func ScanBaseDir(config *Config, handler FileScanedFunc) (*ScanResult, error) {
 	dirConfig, _ := getDirConfig(config)
-	return ScanDir(dirConfig)
+	return ScanDir(dirConfig, handler)
 }
 
 /*
@@ -35,9 +37,9 @@ Returns:
   - [ScanResult] object.
   - an error if any.
 */
-func ScanTargetDir(config *Config) (*ScanResult, error) {
+func ScanTargetDir(config *Config, handler FileScanedFunc) (*ScanResult, error) {
 	_, dirConfig := getDirConfig(config)
-	return ScanDir(dirConfig)
+	return ScanDir(dirConfig, handler)
 }
 
 /*
@@ -50,7 +52,7 @@ Returns:
   - [ScanResult] object.
   - an error if any.
 */
-func ScanDir(config *DirConfig) (*ScanResult, error) {
+func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 	result := &ScanResult{
 		HeaderSize:          config.HeaderSize,
 		Dir:                 config.Dir,
@@ -74,6 +76,10 @@ func ScanDir(config *DirConfig) (*ScanResult, error) {
 		identity, e := getFileIdentity(filename, config.HeaderSize, buffer, config.NeedFullChecksum)
 		if e != nil {
 			return fmt.Errorf("%s: %s", e, filename)
+		}
+
+		if handler != nil {
+			handler(identity)
 		}
 
 		result.FileSize += identity.FileSize

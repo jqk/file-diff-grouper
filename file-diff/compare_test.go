@@ -12,7 +12,7 @@ func TestCompareDirs(t *testing.T) {
 	assert.NotNil(t, config)
 	assert.Nil(t, err)
 
-	more, same, err := CompareDirs(config)
+	more, same, err := CompareDirs(config, nil)
 	assert.Nil(t, err)
 	assert.NotNil(t, more)
 	assert.NotNil(t, same)

@@ -26,7 +26,7 @@ func TestGroupFileDiff(t *testing.T) {
 	assert.Nil(t, err)
 
 	// 移动文件。
-	result, err := GroupFileDiff(config)
+	result, err := GroupFileDiff(config, nil)
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 
