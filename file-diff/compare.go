@@ -43,6 +43,7 @@ func CompareDirs(config *Config) (resultMore *CompareResult, resultSame *Compare
 			targetScanResult,
 			config.HeaderSize,
 			config.BufferSize,
+			config.CompareTarget.CompareFullChecksum,
 		)
 
 		return err
@@ -154,6 +155,7 @@ func compareScanResults(
 	target *ScanResult,
 	headerSize,
 	bufferSize int,
+	compareFullChecksum bool,
 ) (more, same *FileGroup, err error) {
 
 	buffer := make([]byte, bufferSize)
@@ -170,7 +172,12 @@ func compareScanResults(
 
 				for _, baseFile := range baseFiles {
 					if baseFile.FileSize == targetFile.FileSize {
-						// HeaderChecksum 相同且文件长度相同，则要继续对比 FullChecksum。首先确保 FullChecksum 有效。
+						if !compareFullChecksum { // HeaderChecksum 相同且文件长度相同，粗略认为两者相同。
+							foundSame = true
+							break
+						}
+
+						// compareFullChecksum 为 true，则要继续对比 FullChecksum。首先确保 FullChecksum 有效。
 						if err = ensureFullChecksumReady(base, baseFile, headerSize, buffer); err != nil {
 							return // nil, nil, err
 						}
