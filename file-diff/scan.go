@@ -113,60 +113,25 @@ func ScanDir(config *DirConfig) (*ScanResult, error) {
 /*
 getFileIdentity 通过计算文件的整体校验和来获取文件的标识信息。
 */
-func getFileIdentity(
-	filename string,
-	headerSize int,
-	buffer []byte,
-	needFullChecksum bool,
-) (*FileIdentity, error) {
+func getFileIdentity(filename string, headerSize int, buffer []byte, needFullChecksum bool) (*FileIdentity, error) {
 
 	// 使用 crc32 作为校验和算法。
 	crc := crc32.NewIEEE()
-	// 仅对必要字段初始化，其它字段后面会更新。
-	identity := &FileIdentity{
-		HasFullChecksum: needFullChecksum,
-		Filename:        filename,
-	}
+	sumFunc := crc.Sum32
+	provider := fileutils.NewCommonFileChecksumProvider[uint32](crc, sumFunc)
 
-	// 开始定义 fileutils.GetFileChecksum() 需要的 3 个回调函数。
-	// 1. 函数定义参见 fileutils.GetFileChecksum() 的第 4 个参数。
-	calculator := func(data []byte) (int, error) {
-		return crc.Write(data) // 只是计算校验和。
-	}
-
-	// 2. 函数定义参见 fileutils.GetFileChecksum() 的第 5 个参数。
-	headerReadyHandler := func(info os.FileInfo, fullIsReady bool) error {
-		identity.HeaderChecksum = crc.Sum32() // 保存文件头的校验和。
-		identity.FileSize = info.Size()
-		identity.ModifiedTime = info.ModTime()
-
-		if fullIsReady {
-			// fullIsReady 为 true 表示文件长度小于等于 headerSize，所以整体校验和就是文件头的校验和。
-			identity.HasFullChecksum = true
-			identity.FullChecksum = identity.HeaderChecksum
-		}
-		return nil
-	}
-
-	// 3. 函数定义参见 fileutils.GetFileChecksum() 的第 6 个参数。
-	fullReadyHandler := func(info os.FileInfo) error {
-		// 此时 identity.HasFullChecksum 必然为 true
-		identity.FullChecksum = crc.Sum32() // 保存整体校验和。
-		return nil
-	}
-
-	// 是否使用最后一个回调函数由 needFullChecksum 参数决定。
-	// 下面将使用 fullHander 变量而不是直接使用 fullReadyHandler 调用 GetFileChecksum()。
-	fullHandler := fullReadyHandler
-	if !needFullChecksum {
-		// 通过给定的方法指针是否为 nil 来判断是否需要计算完整校验和。
-		fullHandler = nil
-	}
-
-	// 前面都是准备过程，此处调用 GetFileChecksum() 进行实际读取及计算。
-	if err := fileutils.GetFileChecksum(filename, headerSize, buffer,
-		calculator, headerReadyHandler, fullHandler); err != nil {
+	if err := fileutils.GetFileChecksumWithProvider[uint32](
+		filename, headerSize, buffer, provider, true, needFullChecksum); err != nil {
 		return nil, err
+	}
+
+	identity := &FileIdentity{
+		Filename:        filename,
+		HasFullChecksum: provider.IsFullChecksumReady(),
+		HeaderChecksum:  provider.HeaderChecksum(),
+		FullChecksum:    provider.FullChecksum(),
+		FileSize:        provider.FileInfo().Size(),
+		ModifiedTime:    provider.FileInfo().ModTime(),
 	}
 
 	return identity, nil

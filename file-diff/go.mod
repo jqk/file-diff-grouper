@@ -3,7 +3,7 @@ module file-diff
 go 1.20
 
 require (
-	github.com/jqk/futool4go v1.4.1
+	github.com/jqk/futool4go v1.5.0
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 )
