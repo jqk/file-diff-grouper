@@ -126,6 +126,10 @@ compareTarget:
   # 是否对待比较的文件进行整个文件摘要的计算。为 false 计算文件头的摘要值。 
   needFullChecksum: false
 
+  # 当文件头相同，且文件长度也相等时，是否继续比较整个文件的内容。
+  # 如果文件头长度较大，如 10KB，一般情况下，满足前面的条件，即可确定文件内容相同。
+  # 确实不能保证是相同的，但可以大大提高比较速度。
+  CompareFullChecksum: false
   # 保存比较结果的路径，必须是可写的。而且，必需是无需复制，能直接从 dir 移动文件的路径。
   # 可以指定相对或绝对路径。也可以通过 ${dir} 引用 dir 定义的路径。
   backupDir: "z:/result/group"
@@ -189,7 +193,7 @@ filter:
 
 `bufferSize` 定义的是读文件缓冲区的长度，以提高 IO 速度。如果 `bufferSize` 小于 `headerSize`，程序会自动将其调整为 `headerSize` 的值。
 
-#### 4.3.3 needFullChecksum
+#### 4.3.3 needFullChecksum 和 compareFullChecksum
 
 文件头的校验和命名为 `headerChecksum`。如果两个文件的长度及 `headerChecksum` 相同，则需进一步比较其整个文件的校验和 `fullChecksum`。
 
@@ -198,6 +202,10 @@ filter:
 将 `needFullChecksum` 设置为 true 场景是，有一个比较大的目录，需要和其它多个目录反复比较，为避免每次都扫描该目录，则可一次性得到整个目录的完整扫描结果，每次都通过设置 `loadScanResult` 为 true，节约扫描时间。
 
 > 例如，我有个 U 盘，上面有约 5 万个文件，共约 300GB。将 `needFullChecksum` 设置为 true 扫描后得到结果文件 `result.json`。以后我可以只使用 `result.json` 而不必连接该 U 盘即能完成针对该 U 盘上文件的比较。
+
+`compareFullChecksum` 为 false 时只比较 `headerChecksum` 和文件长度。避免读取整个文件将大大提高比较效率。
+
+> 当文件长度相同，且前面 10KB 或 100KB 完全相同，又有多大概率整个文件是不同的呢？
 
 #### 4.3.4 loadScanResult 和 scanResultFile
 

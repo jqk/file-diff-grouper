@@ -26,6 +26,7 @@ compareTarget:
   loadScanResult: true
   needFullChecksum: true
 
+  compareFullChecksum: true
   backupDir: "${dir}/~~~result"
   moveMore: false
   moveSame: false
@@ -53,13 +54,14 @@ var expected Config = Config{
 		NeedFullChecksum: true,
 	},
 	CompareTarget: &CompareTarget{
-		Dir:              "test-data/origin/compare_target",
-		ScanResultFile:   "${dir}/~~~data/target-scan.data.json",
-		LoadScanResult:   true,
-		NeedFullChecksum: true,
-		BackupDir:        "${dir}/~~~result",
-		MoveMore:         false,
-		MoveSame:         false,
+		Dir:                 "test-data/origin/compare_target",
+		ScanResultFile:      "${dir}/~~~data/target-scan.data.json",
+		LoadScanResult:      true,
+		NeedFullChecksum:    true,
+		CompareFullChecksum: true,
+		BackupDir:           "${dir}/~~~result",
+		MoveMore:            false,
+		MoveSame:            false,
 	},
 	Filter: &fileutils.Filter{
 		CaseSensitive: true,

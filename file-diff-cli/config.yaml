@@ -37,6 +37,10 @@ compareTarget:
   loadScanResult: true
   needFullChecksum: false
 
+  # When the file headers are the same and the file lengths are also same, whether to continue comparing the entire file contents.
+  # If the file header length is large, such as 10KB, in general, meeting the preceding conditions can determine that the file contents are the same. 
+  # It cannot be guaranteed to be the same, but it can greatly improve the comparison speed.
+  CompareFullChecksum: false
   # Path to save the comparison results, must be writable.
   # Can be a relative or absolute path. Can also reference the path defined in above using ${dir}.
   backupDir: "z:/result/group"
@@ -74,7 +78,7 @@ filter:
     - "*.log"
 
   # Minimum file size in bytes, 0 or less means no limit,
-  # but will process starting from 1 byte, 0 byte files are skipped.
+  # It's better to process starting from 1 byte, 0 byte files are non sense.
   minFileSize: 1024
 
   # Maximum file size in bytes, 0 or less means no limit.

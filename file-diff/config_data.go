@@ -27,13 +27,14 @@ type CompareBase struct {
 
 // CompareTarget defines the information for the target directory in a comparison.
 type CompareTarget struct {
-	Dir              string `mapstructure:"dir"`              // Dir is the base directory path to compare.
-	ScanResultFile   string `mapstructure:"scanResultFile"`   // ScanResultFile is the file path for a the scan result. Empty string indicates no need to save the scan result.
-	LoadScanResult   bool   `mapstructure:"loadscanResult"`   // LoadScanResult indicates if the scan result should be loaded. Defaults to false.
-	NeedFullChecksum bool   `mapstructure:"needFullChecksum"` // NeedFullChecksum indicates if full checksums are needed. Defaults to false.
-	BackupDir        string `mapstructure:"backupDir"`        // BackupDir is the backup directory path for moving reulst files.
-	MoveMore         bool   `mapstructure:"moveMore"`         // MoveMore indicates if more files should be moved. Defaults to false. 'more' refers to files that are present in the target dir but not in the base dir.
-	MoveSame         bool   `mapstructure:"moveSame"`         // MoveSame indicates if same files should be moved. Defaults to false. 'same' refers to files that are present in both the target dir and base dir.
+	Dir                 string `mapstructure:"dir"`                 // Dir is the base directory path to compare.
+	ScanResultFile      string `mapstructure:"scanResultFile"`      // ScanResultFile is the file path for a the scan result. Empty string indicates no need to save the scan result.
+	LoadScanResult      bool   `mapstructure:"loadscanResult"`      // LoadScanResult indicates if the scan result should be loaded. Defaults to false.
+	NeedFullChecksum    bool   `mapstructure:"needFullChecksum"`    // NeedFullChecksum indicates if full checksums are needed. Defaults to false.
+	CompareFullChecksum bool   `mapstructure:"CompareFullChecksum"` // CompareFullChecksum indicates if full checksums should be compared when headerChecksum and file size are equal. Defaults to false.
+	BackupDir           string `mapstructure:"backupDir"`           // BackupDir is the backup directory path for moving reulst files.
+	MoveMore            bool   `mapstructure:"moveMore"`            // MoveMore indicates if more files should be moved. Defaults to false. 'more' refers to files that are present in the target dir but not in the base dir.
+	MoveSame            bool   `mapstructure:"moveSame"`            // MoveSame indicates if same files should be moved. Defaults to false. 'same' refers to files that are present in both the target dir and base dir.
 }
 
 // DirConfig holds the configuration for a directory scan.

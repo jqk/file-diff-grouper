@@ -123,6 +123,10 @@ compareTarget:
   loadScanResult: true
   needFullChecksum: false
 
+  # When the file headers are the same and the file lengths are also same, whether to continue comparing the entire file contents.
+  # If the file header length is large, such as 10KB, in general, meeting the preceding conditions can determine that the file contents are the same. 
+  # It cannot be guaranteed to be the same, but it can greatly improve the comparison speed.
+  CompareFullChecksum: false
   # Path to save the comparison results, must be writable. 
   # Can be a relative or absolute path. Can also reference the path defined in above using ${dir}.
   backupDir: "z:/result/group"
@@ -190,7 +194,7 @@ In order to calculate file checksums, the binary contents of each file needs to 
 
 `bufferSize` defines the buffer size for file IO, to improve speed. If `bufferSize` is smaller than headerSize, it will be automatically adjusted to the value of `headerSize`.
 
-#### 4.3.3 needFullChecksum
+#### 4.3.3 needFullChecksum & compareFullChecksum
 
 The checksum of the file header is called `headerChecksum`. If two files have the same length and `headerChecksum`, then their full file checksums `fullChecksum` need to be compared further.
 
@@ -199,6 +203,10 @@ If `fullChecksum` is not calculated, `fdg` will automatically calculate and save
 Setting `needFullChecksum` to true is useful in the scenario where there is a large directory that needs to be compared repeatedly with other directories. To avoid rescanning the directory every time, its complete scan result can be obtained once, and in subsequent runs `loadScanResult` can be set to true to save scanning time.
 
 > For example, I have a USB drive with about 50,000 files totaling 300GB. After scanning it with `needFullChecksum` set to true and getting the result file `result.json`, I can then compare files on the USB drive with others using only `result.json` without connecting the USB drive.
+
+When `compareFullChecksum` is false, it only compares the `headerChecksum` and file length. Avoiding reading the entire file will greatly improve the comparison speed. 
+
+> When the file lengths are the same, and the first 10KB or 100KB are exactly the same, what is the probability that the entire files are different?
 
 #### 4.3.4 loadScanResult & scanResultFile
 
