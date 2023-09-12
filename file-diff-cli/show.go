@@ -3,7 +3,6 @@ package main
 import (
 	filediff "file-diff"
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/jqk/futool4go/common"
@@ -32,9 +31,6 @@ func showError(header string, err error, includingHelp bool) {
 	if includingHelp {
 		showHelp()
 	}
-
-	// 实际上，showError() 之后的代码是没有意义的，因为此处已执行退出了。
-	os.Exit(1)
 }
 
 func showGroupResult(result *filediff.GroupResult, config *filediff.Config) {
