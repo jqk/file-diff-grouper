@@ -25,8 +25,8 @@
         "program": "${workspaceFolder}/file-diff-cli",
         "env": {},
         //"args": [],
-        //"args": ["e:/temp/fdg/config-h-160bak.yaml"],
-        "args": [ "config.yaml" ],
+        "args": ["e:/temp/fdg/config-d-2020-整理.yaml"],
+        //"args": [ "config.yaml" ],
         "showLog": true
       }
     ]

@@ -30,7 +30,7 @@ compareTarget:
   loadScanResult: false
   needFullChecksum: false
 
-  CompareFullChecksum: true
+  compareFullChecksum: true
   backupDir: "test-data/output/group_result"
   # 如果都为 false，则不会移动，功能与仅 compare 相同。
   moveMore: true

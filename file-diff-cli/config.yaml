@@ -40,7 +40,7 @@ compareTarget:
   # When the file headers are the same and the file lengths are also same, whether to continue comparing the entire file contents.
   # If the file header length is large, such as 10KB, in general, meeting the preceding conditions can determine that the file contents are the same. 
   # It cannot be guaranteed to be the same, but it can greatly improve the comparison speed.
-  CompareFullChecksum: false
+  compareFullChecksum: false
   # Path to save the comparison results, must be writable.
   # Can be a relative or absolute path. Can also reference the path defined in above using ${dir}.
   backupDir: "z:/result/group"

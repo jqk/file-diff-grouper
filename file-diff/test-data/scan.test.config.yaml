@@ -27,7 +27,7 @@ compareTarget:
   # 要求计算文件摘要。
   needFullChecksum: true
 
-  CompareFullChecksum: true
+  compareFullChecksum: true
   backupDir: "test-data/output"
   moveMore: false
   moveSame: false

@@ -25,7 +25,7 @@ compareTarget:
   loadScanResult: false
   needFullChecksum: false
 
-  CompareFullChecksum: true
+  compareFullChecksum: true
   backupDir: "test-data/output"
   moveMore: false
   moveSame: false
