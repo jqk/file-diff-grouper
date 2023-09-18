@@ -67,7 +67,7 @@ There are no specific requirements for the configuration filename itself, but it
 $ fdg
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file difference grouper (fdg) 0.9.1, 2023-09-13
+file difference grouper (fdg) 0.10.0, 2023-09-18
 
 Usage:
   fdg [path/to/the/taskConfigFile]
@@ -126,7 +126,7 @@ compareTarget:
   # When the file headers are the same and the file lengths are also same, whether to continue comparing the entire file contents.
   # If the file header length is large, such as 10KB, in general, meeting the preceding conditions can determine that the file contents are the same. 
   # It cannot be guaranteed to be the same, but it can greatly improve the comparison speed.
-  CompareFullChecksum: false
+  compareFullChecksum: false
   # Path to save the comparison results, must be writable. 
   # Can be a relative or absolute path. Can also reference the path defined in above using ${dir}.
   backupDir: "z:/result/group"
@@ -184,7 +184,20 @@ filter:
 
 `fdg` first scans all files under `compareBase.dir` and `compareTarget.dir` including subdirectories, to get two scan result sets containing file sizes and checksums. It then compares the records in the two scan results based on the rules above to determine duplicate and extra files.
 
-Currently the CRC32 algorithm is used, which should be sufficient.
+In a 806GB backup containing `216,878` files that are 10 bytes or larger, mainly consisting of images, videos, music, archives, Word documents, PowerPoint files, source code, and some software installation packages. If the file header length is defined as `20KB`, the scan results of going through the backup directory using the following 3 digest algorithms are:
+
+| Algorithm | Number of Unique Header Checksums | Number of Full Checksums | Size of Scan Result File |
+| :---: | :---: |:---: |:---: |
+| CRC32-IEEE | 158237 | 105153 | 90.87MB |
+| CRC64-ISO | 158251 | 105153 | 92.70MB |
+| MD5| 158251 | 105153 | 98.20MB |
+
+The above results illustrate several points:
+
+1. Approximately two-thirds of the files are less than or equal to `20KB` in size, resulting in full checksums.
+2. The number of unique header checksums using `CRC64` is similar to `MD5` and not too different from `CRC32`, which should be sufficient.
+
+> On Windows systems, scanned data is cached. For this directory, the first scan took 7 minutes, while subsequent scans took about 14 seconds.
 
 #### 4.3.2 headerSize & bufferSize
 
@@ -227,58 +240,59 @@ The scan results are saved in `JSON` format, with content like below:
             "*.txt"
         ],
         "Exclude": [
-            "*.log"
+            "*.logg"
         ],
         "MinFileSize": 1024,
         "MaxFileSize": 3072
     },
     "FileCount": 5,
     "FileSize": 9668,
+    "Method": "CRC64-ISO",
     "HeaderChecksumCount": 3,
     "FullChecksumCount": 4,
-    "ElapsedTime": 1050700,
+    "ElapsedTime": 509700,
     "Files": {
-        "3096586316": [
+        "+jj4D1tJbDk=": [
             {
-                "HeaderChecksum": 3096586316,
+                "HeaderChecksum": "+jj4D1tJbDk=",
                 "HasFullChecksum": true,
-                "FullChecksum": 3096586316,
+                "FullChecksum": "+jj4D1tJbDk=",
                 "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\004.txt",
                 "FileSize": 1588,
                 "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
             }
         ],
-        "3222652411": [
+        "FcoCtC78Vtk=": [
             {
-                "HeaderChecksum": 3222652411,
+                "HeaderChecksum": "FcoCtC78Vtk=",
                 "HasFullChecksum": false,
-                "FullChecksum": 0,
+                "FullChecksum": "",
                 "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\001.md",
                 "FileSize": 2278,
                 "ModifiedTime": "2023-06-30T12:57:32.2260055+08:00"
             }
         ],
-        "4245835769": [
+        "j9YpLw+4FYg=": [
             {
-                "HeaderChecksum": 4245835769,
+                "HeaderChecksum": "j9YpLw+4FYg=",
                 "HasFullChecksum": true,
-                "FullChecksum": 4245835769,
+                "FullChecksum": "j9YpLw+4FYg=",
                 "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\dir_0\\002.txt",
                 "FileSize": 1934,
                 "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
             },
             {
-                "HeaderChecksum": 4245835769,
+                "HeaderChecksum": "j9YpLw+4FYg=",
                 "HasFullChecksum": true,
-                "FullChecksum": 4245835769,
+                "FullChecksum": "j9YpLw+4FYg=",
                 "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\dir_0\\dir_1\\003-same-as-002.md",
                 "FileSize": 1934,
                 "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
             },
             {
-                "HeaderChecksum": 4245835769,
+                "HeaderChecksum": "j9YpLw+4FYg=",
                 "HasFullChecksum": true,
-                "FullChecksum": 4245835769,
+                "FullChecksum": "j9YpLw+4FYg=",
                 "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\dir_0\\dir_1\\copy-of-003.md",
                 "FileSize": 1934,
                 "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
@@ -288,20 +302,22 @@ The scan results are saved in `JSON` format, with content like below:
 }
 ```
 
+The checksum is stored in `base64` format.
+
 #### 4.3.5 backupDir
 
 Since the program is designed for cases with extremely large numbers of files, automatic deletion of duplicate files is not provided to avoid hard-to-recover mistakes. Instead, duplicate and extra files are moved to the specified directory for manual confirmation and deletion by the user.
 
 `backupDir` specifies where to move the duplicate and extra files found. This value must be a valid writable path that has ***movable*** relationship with `compareTarget.dir`. After comparison, two result files will be kept in this directory:
 
-- target-more-than-base.txt
-- target-same-with-base.txt
+- `target-more-than-base.txt`
+- `target-same-with-base.txt`
 
 It's obvious that `backupDir` must be writable. The requirement that it must be ***movable*** needs emphasis. Here "movable" means moving can be done without copying the file content. For example on Windows, moving `c:\doc\a.txt` to `c:\backup\a.txt` is extremely fast, without actually reading/writing the file content itself - it's similar to renaming the file. But moving it to `d:\doc\a.txt` would require first reading all content from `c:\doc\a.txt`, writing it to `d:\doc\a.txt`, and finally deleting `c:\doc\a.txt`. Considering there may be a huge number of large files, this would involve massive IO and waste time. Therefore, ***backupDir must have this kind of movable relationship with compareTarget.dir***.
 
 The two result files have the same structure, for example:
 
-```text {.line-numbers}
+```json {.line-numbers}
 {
     "BaseDir": "test-data/origin/compare_base",
     "BaseFileCount": 6,

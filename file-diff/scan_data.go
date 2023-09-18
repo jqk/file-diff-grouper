@@ -2,28 +2,26 @@ package filediff
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/jqk/futool4go/fileutils"
 )
 
-// type ChecksumType uint32
-type ChecksumType uint64
-
 // FileIdentity defines the identity attributes of a file.
 type FileIdentity struct {
-	HeaderChecksum  ChecksumType // HeaderChecksum is the checksum of the file header.
-	HasFullChecksum bool         // HasFullChecksum indicates if there is a full checksum.
-	FullChecksum    ChecksumType // FullChecksum is the full checksum of the file.
-	Filename        string       // Filename is the name of the file.
-	FileSize        int64        // FileSize is the size of the file.
-	ModifiedTime    time.Time    // ModifiedTime is the last modified time of the file.
+	Key             string    `json:"-"` // Base64 of HeaderChecksum.
+	HeaderChecksum  []byte    // HeaderChecksum is the checksum of the file header.
+	HasFullChecksum bool      // HasFullChecksum indicates if there is a full checksum.
+	FullChecksum    []byte    // FullChecksum is the full checksum of the file.
+	Filename        string    // Filename is the name of the file.
+	FileSize        int64     // FileSize is the size of the file.
+	ModifiedTime    time.Time // ModifiedTime is the last modified time of the file.
 }
 
 // FileIdentities is a map of file identity.
@@ -31,7 +29,7 @@ type FileIdentity struct {
 // The key is the header checksum.
 //
 // The value is a slice of file identity with the same header checksum.
-type FileIdentities map[ChecksumType][]*FileIdentity
+type FileIdentities map[string][]*FileIdentity
 
 // ScanResult is the result of a scanning a given directory.
 type ScanResult struct {
@@ -41,6 +39,7 @@ type ScanResult struct {
 	FullChecksumChanged bool              `json:"-"` // FullChecksumChanged indicates if any full checksums changed.
 	FileCount           int               // FileCount is the number of files scanned.
 	FileSize            int64             // FileSize is the total size of all files scanned.
+	Method              string            // Algorithm name
 	HeaderChecksumCount int               // HeaderChecksumCount is the number of header checksums calculated.
 	FullChecksumCount   int               // FullChecksumCount is the number of full checksums calculated.
 	ElapsedTime         time.Duration     // ElapsedTime is the duration of the scan.
@@ -56,13 +55,13 @@ func (f *FileIdentity) Diff(other Differ) string {
 		return ""
 	}
 
-	if f.HeaderChecksum != o.HeaderChecksum {
+	if !bytes.Equal(f.HeaderChecksum, o.HeaderChecksum) {
 		return "FileIdentity.HeaderChecksum"
 	}
 	if f.HasFullChecksum != o.HasFullChecksum {
 		return "FileIdentity.HasFullChecksum"
 	}
-	if f.FullChecksum != o.FullChecksum {
+	if !bytes.Equal(f.FullChecksum, o.FullChecksum) {
 		return "FileIdentity.FullChecksum"
 	}
 	if f.Filename != o.Filename {
@@ -117,7 +116,7 @@ func (r *ScanResult) Diff(other Differ) string {
 		// v 是具有相同文件头校验和的文件信息数组。
 		if len(v) != len(o.Files[k]) {
 			// 这里包含了 k 在 *o 中不存在的情况。
-			return "ScanResult.Files.HeaderChecksum: " + strconv.FormatUint(uint64(k), 10)
+			return "ScanResult.Files.HeaderChecksum: " + k
 		}
 
 		for i := range v {

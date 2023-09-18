@@ -4,14 +4,14 @@
 
 ## 一、 功能
 
-FileDiffGrouper 是一个比较两个目录文件差异的命令行工具。它以二进制方式比较两个目录中的所有文件的内容，而不是文件名。虽然仅在 Windows 10/11 中测试过，但未使用特定的操作系统功能，所以理论上可以在运行于 Linux 和 MacOS。
+`FileDiffGrouper` 是一个比较两个目录文件差异的命令行工具。它以二进制方式比较两个目录中的所有文件的内容，而不是文件名。虽然仅在 Windows 10/11 中测试过，但未使用特定的操作系统功能，所以理论上可以在运行于 Linux 和 MacOS。
 
-FileDiffGrouper 比较两个目录，一个称为 Base 目录，一个称为 Target 目录。FileDiffGrouper 将给出两个结果集合，保存在结果文件中：
+`FileDiffGrouper` 比较两个目录，一个称为 Base 目录，一个称为 Target 目录。`FileDiffGrouper` 将给出两个结果集合，保存在结果文件中：
 
 - MORE 集合：Target 比 Base 多的文件，即 Target 中有，但 Base 中没有的文本，本文中称为`多出文件`。
 - SAME 集合：Target 和 Base 中同时存在的完全相同的文件，本文中称为`重复文件`。
 
-FileDiffGrouper 可以根据选项，直接将以上两个集合的文件，移动到指定的备份目录中。为保证安全，不提供自动删除这些文件的功能。
+`FileDiffGrouper` 可以根据选项，直接将以上两个集合的文件，移动到指定的备份目录中。为保证安全，不提供自动删除这些文件的功能。
 
 ## 二、 解决的问题
 
@@ -67,7 +67,7 @@ fdg c:\test\config.yaml
 $ fdg
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file difference grouper (fdg) 0.9.1, 2023-09-13
+file difference grouper (fdg) 0.10.0, 2023-09-18
 
 Usage:
   fdg [path/to/the/taskConfigFile]
@@ -129,7 +129,7 @@ compareTarget:
   # 当文件头相同，且文件长度也相等时，是否继续比较整个文件的内容。
   # 如果文件头长度较大，如 10KB，一般情况下，满足前面的条件，即可确定文件内容相同。
   # 确实不能保证是相同的，但可以大大提高比较速度。
-  CompareFullChecksum: false
+  compareFullChecksum: false
   # 保存比较结果的路径，必须是可写的。而且，必需是无需复制，能直接从 dir 移动文件的路径。
   # 可以指定相对或绝对路径。也可以通过 ${dir} 引用 dir 定义的路径。
   backupDir: "z:/result/group"
@@ -183,7 +183,20 @@ filter:
 
 `fdg` 先扫描 `compareBase.dir` 和 `compareTarget.dir` 及其子目录中的所有文件，得到两个包含文件长度及校验和的扫描结果，然后根据以上规则对比扫描结果中的记录，确定重复文件多出文件。
 
-目前使用 `CRC32` 算法，应已够用。
+在一份 806GB，`216878` 个大于等于 10 字节的文件备份中，主要为图片、视频、音乐、压缩文件、Word、PPT、程序源码、一些软件的安装包。如果文件头长度定义为 `20KB`，则使用以下 3 种摘要算法扫描该备份目录得到的扫描结果如下：
+
+| 算法 | 不同文件头校验值数量 | 整体校验值数量 | 扫描结果文件大小 |
+| :---: | :---: |:---: |:---: |
+| CRC32-IEEE | 158237 | 105153 | 90.87MB |
+| CRC64-ISO | 158251 | 105153 | 92.70MB |
+| MD5| 158251 | 105153 | 98.20MB |
+
+以上结果说明几个问题：
+
+1. 约三分之二的文件小于等于 `20KB`，得到了整体校验值。
+2. 使用 `CRC64` 算法得到的不同文件头校验值数量与使用 `MD5` 相同，与 `CRC32` 相差不大，应已够用。
+
+> Windows 系统会缓存扫描到的数据。以该目录为例，第一次扫描耗时 7 分钟，再次扫描耗时约 14 秒。
 
 #### 4.3.2 headerSize 和 bufferSize
 
@@ -226,58 +239,59 @@ filter:
             "*.txt"
         ],
         "Exclude": [
-            "*.log"
+            "*.logg"
         ],
         "MinFileSize": 1024,
         "MaxFileSize": 3072
     },
     "FileCount": 5,
     "FileSize": 9668,
+    "Method": "CRC64-ISO",
     "HeaderChecksumCount": 3,
     "FullChecksumCount": 4,
-    "ElapsedTime": 1050700,
+    "ElapsedTime": 509700,
     "Files": {
-        "3096586316": [
+        "+jj4D1tJbDk=": [
             {
-                "HeaderChecksum": 3096586316,
+                "HeaderChecksum": "+jj4D1tJbDk=",
                 "HasFullChecksum": true,
-                "FullChecksum": 3096586316,
+                "FullChecksum": "+jj4D1tJbDk=",
                 "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\004.txt",
                 "FileSize": 1588,
                 "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
             }
         ],
-        "3222652411": [
+        "FcoCtC78Vtk=": [
             {
-                "HeaderChecksum": 3222652411,
+                "HeaderChecksum": "FcoCtC78Vtk=",
                 "HasFullChecksum": false,
-                "FullChecksum": 0,
+                "FullChecksum": "",
                 "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\001.md",
                 "FileSize": 2278,
                 "ModifiedTime": "2023-06-30T12:57:32.2260055+08:00"
             }
         ],
-        "4245835769": [
+        "j9YpLw+4FYg=": [
             {
-                "HeaderChecksum": 4245835769,
+                "HeaderChecksum": "j9YpLw+4FYg=",
                 "HasFullChecksum": true,
-                "FullChecksum": 4245835769,
+                "FullChecksum": "j9YpLw+4FYg=",
                 "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\dir_0\\002.txt",
                 "FileSize": 1934,
                 "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
             },
             {
-                "HeaderChecksum": 4245835769,
+                "HeaderChecksum": "j9YpLw+4FYg=",
                 "HasFullChecksum": true,
-                "FullChecksum": 4245835769,
+                "FullChecksum": "j9YpLw+4FYg=",
                 "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\dir_0\\dir_1\\003-same-as-002.md",
                 "FileSize": 1934,
                 "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
             },
             {
-                "HeaderChecksum": 4245835769,
+                "HeaderChecksum": "j9YpLw+4FYg=",
                 "HasFullChecksum": true,
-                "FullChecksum": 4245835769,
+                "FullChecksum": "j9YpLw+4FYg=",
                 "Filename": "e:\\github\\jqk\\file-diff-grouper\\file-diff\\test-data\\origin\\compare_base\\dir_0\\dir_1\\copy-of-003.md",
                 "FileSize": 1934,
                 "ModifiedTime": "2023-06-30T12:57:32.2270053+08:00"
@@ -287,20 +301,22 @@ filter:
 }
 ```
 
+校验和以 `base64` 格式保存。
+
 #### 4.3.5 backupDir
 
 由于程序主要针对文件量极大的情况设计，因此为避免自动删除重复文件产生不易挽回的错误，所以不提供自动删除功能，而是将重复文件以及多出文件移动到指定的目录中，用户可确认后手动删除。
 
 `backupDir` 指定重复文件及多出文件的移动位置。该值必须为有效的位置，并且是**可写**的且**可移动**。比较完成后会有两个比较结果文件保留到该目录中：
 
-- target-more-than-base.txt
-- target-same-with-base.txt
+- `target-more-than-base.txt`
+- `target-same-with-base.txt`
 
 `backupDir` 必须可写不必多说，必须**可移动**需要再次强调。此处的可移动指的是无需复制文件。以 Windows 为例，将 `c:\doc\a.txt` 移动到 `c:\backup\a.txt` 是极为迅速的，没有针对文件本身的读取与写入，类似于修改文件名；而将其移动到 `d:\doc\a.txt`，要先读取 `c:\doc\a.txt` 的全部内容，再将其写入到 `d:\doc\a.txt`，最后再将 `c:\doc\a.txt` 删除。考虑到文件可能很多、很大，这将涉及大量 IO，浪费时间。所以，**backupDir 一定要与 compareTarget.dir 有这种可移动关系**。
 
 这两个文件的结构相同，示例如下：
 
-```text {.line-numbers}
+```json {.line-numbers}
 {
     "BaseDir": "test-data/origin/compare_base",
     "BaseFileCount": 6,

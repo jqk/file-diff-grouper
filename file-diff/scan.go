@@ -1,6 +1,7 @@
 package filediff
 
 import (
+	"encoding/base64"
 	"fmt"
 	"hash/crc64"
 	"os"
@@ -53,12 +54,15 @@ Returns:
   - an error if any.
 */
 func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
+
+	provider := createChecksumProvider()
 	result := &ScanResult{
 		HeaderSize:          config.HeaderSize,
 		Dir:                 config.Dir,
 		Filter:              config.Filter,
 		FileCount:           0,
 		FileSize:            0,
+		Method:              provider.Method(),
 		HeaderChecksumCount: 0,
 		FullChecksumCount:   0,
 		ElapsedTime:         0,
@@ -66,7 +70,6 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 	}
 
 	buffer := make([]byte, config.BufferSize) // 准备可以重复使用的缓冲区。
-	provider := createChecksumProvider()
 	var err error
 	stopwatch := timeutils.Stopwatch{}
 	stopwatch.Start()
@@ -90,7 +93,7 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 			result.FullChecksumCount++
 		}
 
-		key := identity.HeaderChecksum
+		key := base64.StdEncoding.EncodeToString(identity.HeaderChecksum)
 		if _, ok := result.Files[key]; !ok {
 			// 结果集中不存在对应 HeaderChecksum 的文件数组，说明是新的 HeaderChecksum，
 			// 要添加一个新的文件数组，同时计数。
@@ -125,11 +128,11 @@ func getFileIdentity(
 	headerSize int,
 	buffer []byte,
 	needFullChecksum bool,
-	provider *fileutils.CommonFileChecksumProvider[ChecksumType],
+	provider *fileutils.CommonFileChecksumProvider,
 ) (*FileIdentity, error) {
 
-	if err := fileutils.GetFileChecksumWithProvider[ChecksumType](
-		filename, headerSize, buffer, provider, true, needFullChecksum); err != nil {
+	if err := fileutils.GetFileChecksumWithProvider(
+		filename, headerSize, buffer, true, needFullChecksum, provider); err != nil {
 		return nil, err
 	}
 
@@ -145,13 +148,8 @@ func getFileIdentity(
 	return identity, nil
 }
 
-func createChecksumProvider() *fileutils.CommonFileChecksumProvider[ChecksumType] {
-	hash := crc64.New(crc64.MakeTable(crc64.ISO))
-	// hash := crc32.NewIEEE()
-	sumFunc := func([]byte) ChecksumType {
-		return ChecksumType(hash.Sum64())
-		// return ChecksumType(hash.Sum32())
-	}
-
-	return fileutils.NewCommonFileChecksumProvider[ChecksumType]("CRC64-ISO", hash, sumFunc)
+func createChecksumProvider() *fileutils.CommonFileChecksumProvider {
+	//return fileutils.NewCommonFileChecksumProvider("CRC32-IEEE", crc32.NewIEEE())
+	return fileutils.NewCommonFileChecksumProvider("CRC64-ISO", crc64.New(crc64.MakeTable(crc64.ISO)))
+	//return fileutils.NewCommonFileChecksumProvider("MD5", md5.New())
 }

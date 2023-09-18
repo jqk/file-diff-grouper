@@ -11,7 +11,7 @@ import (
 func showVersion() {
 	fmt.Println()
 	fmt.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
-	fmt.Println("file difference grouper (fdg) 0.9.2, 2023-09-13")
+	fmt.Println("file difference grouper (fdg) 0.10.0, 2023-09-18")
 	fmt.Println()
 }
 
@@ -81,6 +81,7 @@ func showScanResult(result *filediff.ScanResult, config *filediff.Config, result
 	fmt.Printf("Scan dir            : %s\n", dir)
 	fmt.Printf("Scan file count     : %d\n", result.FileCount)
 	fmt.Printf("Scan file size      : %s\n", common.ToSizeString(result.FileSize))
+	fmt.Printf("Method              : %s\n", result.Method)
 	fmt.Printf("HeaderChecksum Count: %d\n", result.HeaderChecksumCount)
 
 	resultFilename, _ = filepath.Abs(resultFilename)

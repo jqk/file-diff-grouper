@@ -136,7 +136,7 @@ func ensureFullChecksumReady(
 	f *FileIdentity,
 	headerSize int,
 	buffer []byte,
-	provider *fileutils.CommonFileChecksumProvider[ChecksumType],
+	provider *fileutils.CommonFileChecksumProvider,
 ) error {
 	if !f.HasFullChecksum {
 		// 没有完整校验和，通过设置最后一个参数为 true，计算整体校验和。
