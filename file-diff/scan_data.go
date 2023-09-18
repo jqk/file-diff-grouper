@@ -13,14 +13,17 @@ import (
 	"github.com/jqk/futool4go/fileutils"
 )
 
+// type ChecksumType uint32
+type ChecksumType uint64
+
 // FileIdentity defines the identity attributes of a file.
 type FileIdentity struct {
-	HeaderChecksum  uint32    // HeaderChecksum is the checksum of the file header.
-	HasFullChecksum bool      // HasFullChecksum indicates if there is a full checksum.
-	FullChecksum    uint32    // FullChecksum is the full checksum of the file.
-	Filename        string    // Filename is the name of the file.
-	FileSize        int64     // FileSize is the size of the file.
-	ModifiedTime    time.Time // ModifiedTime is the last modified time of the file.
+	HeaderChecksum  ChecksumType // HeaderChecksum is the checksum of the file header.
+	HasFullChecksum bool         // HasFullChecksum indicates if there is a full checksum.
+	FullChecksum    ChecksumType // FullChecksum is the full checksum of the file.
+	Filename        string       // Filename is the name of the file.
+	FileSize        int64        // FileSize is the size of the file.
+	ModifiedTime    time.Time    // ModifiedTime is the last modified time of the file.
 }
 
 // FileIdentities is a map of file identity.
@@ -28,7 +31,7 @@ type FileIdentity struct {
 // The key is the header checksum.
 //
 // The value is a slice of file identity with the same header checksum.
-type FileIdentities map[uint32][]*FileIdentity
+type FileIdentities map[ChecksumType][]*FileIdentity
 
 // ScanResult is the result of a scanning a given directory.
 type ScanResult struct {

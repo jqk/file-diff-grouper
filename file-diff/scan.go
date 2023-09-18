@@ -2,7 +2,7 @@ package filediff
 
 import (
 	"fmt"
-	"hash/crc32"
+	"hash/crc64"
 	"os"
 	"path/filepath"
 
@@ -66,6 +66,7 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 	}
 
 	buffer := make([]byte, config.BufferSize) // 准备可以重复使用的缓冲区。
+	provider := createChecksumProvider()
 	var err error
 	stopwatch := timeutils.Stopwatch{}
 	stopwatch.Start()
@@ -73,7 +74,7 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 	err = config.Filter.GetEachFile(config.Dir, nil, func(path string, info os.FileInfo) error {
 		// 因为 GetEachFile() 调用本代码给出的 path 必然是有效的，所以 Abs() 不会返回错误，也就不必处理。
 		filename, _ := filepath.Abs(path)
-		identity, e := getFileIdentity(filename, config.HeaderSize, buffer, config.NeedFullChecksum)
+		identity, e := getFileIdentity(filename, config.HeaderSize, buffer, config.NeedFullChecksum, provider)
 		if e != nil {
 			return fmt.Errorf("%s: %s", e, filename)
 		}
@@ -119,12 +120,15 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 /*
 getFileIdentity 通过计算文件的整体校验和来获取文件的标识信息。
 */
-func getFileIdentity(filename string, headerSize int, buffer []byte, needFullChecksum bool) (*FileIdentity, error) {
-	crc := crc32.NewIEEE() // 使用 crc32 作为校验和算法。仅需改变此处的 hash 及取得最后结果的函数引用即可。
-	sumFunc := crc.Sum32   // 注意函数必须是前面建立的 hash 对象的函数引用。
-	provider := fileutils.NewCommonFileChecksumProvider[uint32](crc, sumFunc)
+func getFileIdentity(
+	filename string,
+	headerSize int,
+	buffer []byte,
+	needFullChecksum bool,
+	provider *fileutils.CommonFileChecksumProvider[ChecksumType],
+) (*FileIdentity, error) {
 
-	if err := fileutils.GetFileChecksumWithProvider[uint32](
+	if err := fileutils.GetFileChecksumWithProvider[ChecksumType](
 		filename, headerSize, buffer, provider, true, needFullChecksum); err != nil {
 		return nil, err
 	}
@@ -139,4 +143,15 @@ func getFileIdentity(filename string, headerSize int, buffer []byte, needFullChe
 	}
 
 	return identity, nil
+}
+
+func createChecksumProvider() *fileutils.CommonFileChecksumProvider[ChecksumType] {
+	hash := crc64.New(crc64.MakeTable(crc64.ISO))
+	// hash := crc32.NewIEEE()
+	sumFunc := func([]byte) ChecksumType {
+		return ChecksumType(hash.Sum64())
+		// return ChecksumType(hash.Sum32())
+	}
+
+	return fileutils.NewCommonFileChecksumProvider[ChecksumType]("CRC64-ISO", hash, sumFunc)
 }

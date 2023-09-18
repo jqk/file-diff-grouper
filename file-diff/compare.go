@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"sort"
 
+	"github.com/jqk/futool4go/fileutils"
 	t "github.com/jqk/futool4go/timeutils"
 )
 
@@ -125,14 +126,21 @@ Parameters:
   - f: a pointer to a FileIdentity struct
   - headerSize: an integer representing the size of the file header
   - bufferSize: the buffer
+  - provider: a pointer to a CommonFileChecksumProvider
 
 Returns:
   - an error if there was an issue getting the file identity.
 */
-func ensureFullChecksumReady(r *ScanResult, f *FileIdentity, headerSize int, buffer []byte) error {
+func ensureFullChecksumReady(
+	r *ScanResult,
+	f *FileIdentity,
+	headerSize int,
+	buffer []byte,
+	provider *fileutils.CommonFileChecksumProvider[ChecksumType],
+) error {
 	if !f.HasFullChecksum {
 		// 没有完整校验和，通过设置最后一个参数为 true，计算整体校验和。
-		if c, err := getFileIdentity(f.Filename, headerSize, buffer, true); err != nil {
+		if c, err := getFileIdentity(f.Filename, headerSize, buffer, true, provider); err != nil {
 			return err
 		} else {
 			f.HasFullChecksum = true
@@ -158,6 +166,7 @@ func compareScanResults(
 	compareFullChecksum bool,
 ) (more, same *FileGroup, err error) {
 
+	provider := createChecksumProvider()
 	buffer := make([]byte, bufferSize)
 	more = &FileGroup{}
 	same = &FileGroup{}
@@ -178,10 +187,10 @@ func compareScanResults(
 						}
 
 						// compareFullChecksum 为 true，则要继续对比 FullChecksum。首先确保 FullChecksum 有效。
-						if err = ensureFullChecksumReady(base, baseFile, headerSize, buffer); err != nil {
+						if err = ensureFullChecksumReady(base, baseFile, headerSize, buffer, provider); err != nil {
 							return // nil, nil, err
 						}
-						if err = ensureFullChecksumReady(target, targetFile, headerSize, buffer); err != nil {
+						if err = ensureFullChecksumReady(target, targetFile, headerSize, buffer, provider); err != nil {
 							return // nil, nil, err
 						}
 						if reflect.DeepEqual(baseFile.FullChecksum, targetFile.FullChecksum) {
