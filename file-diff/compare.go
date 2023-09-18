@@ -181,8 +181,14 @@ func compareScanResults(
 
 				for _, baseFile := range baseFiles {
 					if baseFile.FileSize == targetFile.FileSize {
-						if !compareFullChecksum { // HeaderChecksum 相同且文件长度相同，粗略认为两者相同。
-							foundSame = true
+						if !compareFullChecksum {
+							if baseFile.HasFullChecksum && targetFile.HasFullChecksum {
+								// 有 FullChecksum，直接比较。
+								foundSame = reflect.DeepEqual(baseFile.FullChecksum, targetFile.FullChecksum)
+							} else { // HeaderChecksum 相同且文件长度相同，但缺少 FullChecksum，粗略认为两者相同。
+								foundSame = true
+							}
+
 							break
 						}
 
