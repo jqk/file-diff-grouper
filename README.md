@@ -184,28 +184,33 @@ filter:
 
 `fdg` first scans all files under `compareBase.dir` and `compareTarget.dir` including subdirectories, to get two scan result sets containing file sizes and checksums. It then compares the records in the two scan results based on the rules above to determine duplicate and extra files.
 
-In a 806GB backup containing `216,878` files that are 10 bytes or larger, mainly consisting of images, videos, music, archives, Word documents, PowerPoint files, source code, and some software installation packages. If the file header length is defined as `20KB`, the scan results of going through the backup directory using the following 3 digest algorithms are:
-
-| Algorithm | Number of Unique Header Checksums | Number of Full Checksums | Size of Scan Result File |
-| :---: | :---: |:---: |:---: |
-| CRC32-IEEE | 158237 | 105153 | 90.87MB |
-| CRC64-ISO | 158251 | 105153 | 92.70MB |
-| MD5| 158251 | 105153 | 98.20MB |
-
-The above results illustrate several points:
-
-1. Approximately two-thirds of the files are less than or equal to `20KB` in size, resulting in full checksums.
-2. The number of unique header checksums using `CRC64` is similar to `MD5` and not too different from `CRC32`, which should be sufficient.
-
-> On Windows systems, scanned data is cached. For this directory, the first scan took 7 minutes, while subsequent scans took about 14 seconds.
-
 #### 4.3.2 headerSize & bufferSize
 
 In order to calculate file checksums, the binary contents of each file needs to be read. Reading the entire contents of all files would take too much time, so `headerSize` is defined. For example, if there are 100 files of 1GB each, and `needFullChecksum` is set to true, 100GB of data will be read. If set to false and `headerSize` is 1024 bytes, only 100KB of data will be read, which is much faster.
 
-`headerSize` should not be set too large, 1024 to 10240 is recommended. If `headerSize` is set smaller than 1024, it will be automatically adjusted to 1024 by the program.
+`headerSize` should not be set too large, `10240` to `51200` is recommended. If `headerSize` is set smaller than 1024, it will be automatically adjusted to 1024 by the program.
 
 `bufferSize` defines the buffer size for file IO, to improve speed. If `bufferSize` is smaller than headerSize, it will be automatically adjusted to the value of `headerSize`.
+
+Taking one of my backups as an example, there are `216878` files that are 10 bytes or larger, mainly consisting of images, videos, music, compressed files, Word documents, PowerPoint presentations, program source code, some software installation packages, totaling about 806GB. Scanning was performed with the following settings, using 3 algorithms respectively.
+
+The number of unique `headerChecksum` values obtained, and the number of files with length less than or equal to `headerSize` are as follows:
+
+| headerSize | CRC32 | CRC64 | MD5 | count of small file | small file rate |
+| :---: | :---: |:---: |:---: | :---: | :---: |
+| 10KB | 158237 | 158251 | 158251 | 105153 | 48.5% |
+| 20KB | 158580 | 158594 | 158594 | 129644 | 59.8% |
+| 40KB | 158826 | 158839 | 158839 | 144089 | 66.4% |
+
+> The percentage of small files is the number of small files divided by the total file count `216878`. These small files will automatically get `fullChecksum`.
+
+Above results leads to the following conclusions:
+
+1. The larger the `headerSize`, the more unique `headerChecksum` values obtained, but the increase is limited.
+1. The number of `headerChecksum` values obtained using the `CRC64` is same as using `MD5`, and is not more than `CRC32`.
+1. Considering reducing the amount of data read and computations, `fdg` uses the `CRC64` algorithm; it is recommended setting `headerSize` to 40KB.
+
+> On Windows systems, scanned data is cached. For this directory, the first scan took 7 minutes, while subsequent scans took about 14 seconds.
 
 #### 4.3.3 needFullChecksum & compareFullChecksum
 
