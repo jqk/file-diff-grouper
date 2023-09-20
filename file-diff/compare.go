@@ -139,7 +139,7 @@ func ensureFullChecksumReady(
 	provider *fileutils.CommonFileChecksumProvider,
 ) error {
 	if !f.HasFullChecksum {
-		// 没有完整校验和，通过设置最后一个参数为 true，计算整体校验和。
+		// 没有完整校验和，计算整体校验和。
 		if c, err := getFileIdentity(f.Filename, headerSize, buffer, true, provider); err != nil {
 			return err
 		} else {
@@ -174,13 +174,13 @@ func compareScanResults(
 	for targetHeaderChecksum, targetFiles := range target.Files {
 		// targetHeaderChecksum 就是 target 目录中文件的 HeaderChecksum。
 		if baseFiles, ok := base.Files[targetHeaderChecksum]; ok {
-			// 在 base 中有和 targetHeaderChecksum 相同的文件数组，
-			// 继续在 baseFiles 中查找与 targetFile 元素相同的元素。
+			// 在 base 中有和 targetHeaderChecksum 相同的文件数组，说明有两组文件的文件头相同。
+			// 需继续确认在 baseFiles 中是否有 targetFiles 相同的文件。
 			for _, targetFile := range targetFiles {
-				foundSame := false
+				foundSame := false // 在 baseFiles 中找到了和 targetFiles 相同的文件。默认为 false。
 
 				for _, baseFile := range baseFiles {
-					if baseFile.FileSize == targetFile.FileSize {
+					if baseFile.FileSize == targetFile.FileSize { // 文件大小相同才有继续比较的意义。
 						if !compareFullChecksum {
 							if baseFile.HasFullChecksum && targetFile.HasFullChecksum {
 								// 有 FullChecksum，直接比较。
@@ -188,7 +188,6 @@ func compareScanResults(
 							} else { // HeaderChecksum 相同且文件长度相同，但缺少 FullChecksum，粗略认为两者相同。
 								foundSame = true
 							}
-
 							break
 						}
 

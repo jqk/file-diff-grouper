@@ -129,15 +129,20 @@ func (r *ScanResult) Diff(other Differ) string {
 	return ""
 }
 
-// sortFileIdentities sorts the given slice of FileIdentity pointers in ascending order by Filename.
+// sortFileIdentities sorts the given slice of FileIdentity in ascending order by FileSize.
 //
 // identities: a slice of pointers to FileIdentity structs to be sorted.
 //
 // No return value.
 func sortFileIdentities(identities []*FileIdentity) {
 	sort.Slice(identities, func(i, j int) bool {
-		// 只有包含路径在内的文件名是真正唯一的。用其它属性排序都不太合适。
-		return identities[i].Filename < identities[j].Filename
+		if identities[i].FileSize < identities[j].FileSize {
+			return true
+		} else if identities[i].FileSize == identities[j].FileSize {
+			return identities[i].Filename < identities[j].Filename
+		}
+
+		return false
 	})
 }
 
