@@ -105,6 +105,12 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 		return nil
 	})
 
+	for _, files := range result.Files {
+		if len(files) > 1 {
+			sortFileIdentities(files)
+		}
+	}
+
 	if err != nil {
 		return nil, err
 	}

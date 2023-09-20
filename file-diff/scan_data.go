@@ -175,11 +175,6 @@ func SaveScanResult(result *ScanResult, filename string) error {
 	}
 	defer file.Close()
 
-	// 对于每个 HeaderChecksum 下的一组文件排序。这样可以保证每次结果都是一致的。
-	for _, v := range result.Files {
-		sortFileIdentities(v)
-	}
-
 	writer := bufio.NewWriter(file)
 	encoder := json.NewEncoder(writer)
 	// 空字符串为首行不缩进，其他行缩进 4 个空格
