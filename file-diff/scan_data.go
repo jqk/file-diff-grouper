@@ -41,9 +41,9 @@ type ScanResult struct {
 	FileSize            int64             // FileSize is the total size of all files scanned.
 	HeaderChecksumCount int               // HeaderChecksumCount is the number of header checksums calculated.
 	FullChecksumCount   int               // FullChecksumCount is the number of full checksums calculated.
+	DupGroupCount       int               // DupGroupCount is the number of groups of files with duplicate header checksums and file sizes.
 	DupFileCount        int               // DupFileCount is the number of files with duplicate header checksums and file sizes.
 	DupFileSize         int64             // DupFileSize is the total size of files with duplicate header checksums and file sizes.
-	DupGroupCount       int               // DupGroupCount is the number of groups of files with duplicate header checksums and file sizes.
 	ElapsedTime         time.Duration     // ElapsedTime is the duration of the scan.
 	Files               FileIdentities    // Files contains the detailed scan results for each file.
 }

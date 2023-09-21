@@ -11,7 +11,7 @@ import (
 func showVersion() {
 	fmt.Println()
 	fmt.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
-	fmt.Println("file difference grouper (fdg) 0.10.0, 2023-09-18")
+	fmt.Println("file difference grouper (fdg) 1.0.0, 2023-09-21")
 	fmt.Println()
 }
 
@@ -43,10 +43,10 @@ func showGroupResult(result *filediff.GroupResult, config *filediff.Config) {
 
 	fmt.Printf("Action: %s\n\n", config.Action)
 
-	fmt.Printf("Header size        : %d\n", config.HeaderSize)
-	fmt.Printf("CompareFullChecksum: %t\n", config.CompareTarget.CompareFullChecksum)
 	fmt.Printf("Base   Dir         : %s\n", baseDir)
 	fmt.Printf("Target Dir         : %s\n", targetDir)
+	fmt.Printf("Header size        : %d\n", config.HeaderSize)
+	fmt.Printf("CompareFullChecksum: %t\n", config.CompareTarget.CompareFullChecksum)
 	fmt.Printf("Base file count    : %d\n", result.More.BaseFileCount)
 	fmt.Printf("Target file count  : %d\n", result.More.TargetFileCount)
 	fmt.Printf("More file count    : %d\n", len(result.More.FileGroup.Files))
@@ -77,17 +77,20 @@ func showScanResult(result *filediff.ScanResult, config *filediff.Config, result
 	dir, _ := filepath.Abs(result.Dir)
 
 	fmt.Printf("Action: %s\n\n", config.Action)
-	fmt.Printf("Header size         : %d\n", config.HeaderSize)
-	fmt.Printf("Scan dir            : %s\n", dir)
-	fmt.Printf("Scan file count     : %d\n", result.FileCount)
-	fmt.Printf("Scan file size      : %s\n", common.ToSizeString(result.FileSize))
-	fmt.Printf("Method              : %s\n", result.Method)
-	fmt.Printf("HeaderChecksum Count: %d\n", result.HeaderChecksumCount)
 
+	fmt.Printf("Method               : %s\n", result.Method)
+	fmt.Printf("Header size          : %d\n", config.HeaderSize)
+	fmt.Printf("Scan dir             : %s\n", dir)
 	resultFilename, _ = filepath.Abs(resultFilename)
-
-	fmt.Printf("Scan result file    : %s\n", resultFilename)
-	fmt.Printf("Time elapsed        : %s\n\n", result.ElapsedTime)
+	fmt.Printf("Scan result file     : %s\n", resultFilename)
+	fmt.Printf("Scan file count      : %d\n", result.FileCount)
+	fmt.Printf("Scan file size       : %s\n", common.ToSizeString(result.FileSize))
+	fmt.Printf("HeaderChecksum count : %d\n", result.HeaderChecksumCount)
+	fmt.Printf("FullChecksum count   : %d\n", result.FullChecksumCount)
+	fmt.Printf("Duplicate group count: %d\n", result.DupGroupCount)
+	fmt.Printf("Duplicate file count : %d\n", result.DupFileCount)
+	fmt.Printf("Duplicate file size  : %d\n", result.DupFileSize)
+	fmt.Printf("Time elapsed         : %s\n\n", result.ElapsedTime)
 }
 
 var progressShowed = false

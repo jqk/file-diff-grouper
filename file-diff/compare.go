@@ -36,6 +36,9 @@ func CompareDirs(config *Config, handler FileScanedFunc) (resultMore *CompareRes
 	if targetScanResult, err = getScanResult(targetConfig, handler); err != nil {
 		return nil, nil, err
 	}
+	if baseScanResult.Method != targetScanResult.Method {
+		return nil, nil, errors.New("base and target scan are not using same digest method")
+	}
 
 	// 比较两个目录的扫描结果。将得到两个目录都有的文件列表 same，以及 target 比 base 多出的文件列表 more。
 	elapsedTime, _ := (&t.Stopwatch{}).Elapsing(func() error {
