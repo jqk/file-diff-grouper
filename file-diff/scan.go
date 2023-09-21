@@ -112,7 +112,7 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 		return nil, err
 	}
 
-	sortAndFindDupFiles(result)
+	sortAndFindDupFiles(result, buffer, provider)
 
 	// 保存文件的耗时不计入工作耗时。
 	stopwatch.Stop()
@@ -125,7 +125,7 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 	return result, nil
 }
 
-func sortAndFindDupFiles(r *ScanResult) {
+func sortAndFindDupFiles(r *ScanResult, buffer []byte, provider *fileutils.CommonFileChecksumProvider) {
 	for _, identities := range r.Files {
 		if len(identities) > 1 { // 多个文件具有相同的 headerChecksum 才需排序并查重。
 			sortFileIdentities(identities) // 1. 排序。
@@ -133,7 +133,15 @@ func sortAndFindDupFiles(r *ScanResult) {
 			m := FileIdentities{} // 2. 准备查重。
 
 			for _, id := range identities {
-				// 使用文件长度加整体校验和作为 key。这是判断文件是否重复的标准。即使 fullChecksum 无值，也要加上。
+				if !id.HasFullChecksum && r.CompareFullChecksum {
+					// 如果没有 FullChecksum，并且要求计算之，则补全。
+					temp, _ := getFileIdentity(id.Filename, r.HeaderSize, buffer, true, provider)
+					id.HasFullChecksum = true
+					id.FullChecksum = temp.FullChecksum
+					r.FullChecksumCount++
+				}
+
+				// 使用文件长度加整体校验和作为 key。这是判断文件是否重复的标准。
 				key := strconv.FormatInt(id.FileSize, 10) + "_" + checksumToString(id.FullChecksum)
 				m[key] = append(m[key], id)
 			}

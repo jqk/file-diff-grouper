@@ -18,6 +18,7 @@ compareBase:
   loadScanResult: false
   # 不要求计算文件摘要。
   needFullChecksum: false
+  compareFullChecksum: true
 
 compareTarget:
   dir: "test-data/origin/compare_target"
@@ -26,8 +27,8 @@ compareTarget:
   loadScanResult: false
   # 要求计算文件摘要。
   needFullChecksum: true
-
   compareFullChecksum: true
+
   backupDir: "test-data/output"
   moveMore: false
   moveSame: false
