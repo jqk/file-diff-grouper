@@ -6,6 +6,7 @@ import (
 	"hash/crc64"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/jqk/futool4go/fileutils"
 	"github.com/jqk/futool4go/timeutils"
@@ -93,10 +94,10 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 			result.FullChecksumCount++
 		}
 
-		key := base64.StdEncoding.EncodeToString(identity.HeaderChecksum)
+		key := checksumToString(identity.HeaderChecksum)
 		if _, ok := result.Files[key]; !ok {
 			// 结果集中不存在对应 HeaderChecksum 的文件数组，说明是新的 HeaderChecksum，
-			// 要添加一个新的文件数组，同时计数。
+			// 要添加一个新的文件数组(实际不添加也会自动添加)，同时计数。
 			result.Files[key] = []*FileIdentity{}
 			result.HeaderChecksumCount++
 		}
@@ -105,15 +106,11 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 		return nil
 	})
 
-	for _, files := range result.Files {
-		if len(files) > 1 {
-			sortFileIdentities(files)
-		}
-	}
-
 	if err != nil {
 		return nil, err
 	}
+
+	sortAndFindDupFiles(result)
 
 	// 保存文件的耗时不计入工作耗时。
 	stopwatch.Stop()
@@ -124,6 +121,35 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 	}
 
 	return result, nil
+}
+
+func sortAndFindDupFiles(r *ScanResult) {
+	for _, identities := range r.Files {
+		if len(identities) > 1 { // 多个文件具有相同的 headerChecksum 才需排序并查重。
+			sortFileIdentities(identities) // 1. 排序。
+
+			m := FileIdentities{} // 2. 准备查重。
+
+			for _, id := range identities {
+				// 使用文件长度加整体校验和作为 key。这是判断文件是否重复的标准。即使 fullChecksum 无值，也要加上。
+				key := strconv.FormatInt(id.FileSize, 10) + "_" + checksumToString(id.FullChecksum)
+				m[key] = append(m[key], id)
+			}
+
+			for _, ids := range m {
+				count := len(ids) - 1 // 如果 3 个文件完全相同，说明有 2 个是重复的，所以减一。
+				if count > 0 {        // 某个 key 出现了多于 1 次，说明有重复。
+					r.DupGroupCount++
+					r.DupFileCount += count
+					r.DupFileSize += ids[0].FileSize * int64(count)
+				}
+			}
+		}
+	}
+}
+
+func checksumToString(checksum []byte) string {
+	return base64.StdEncoding.EncodeToString(checksum)
 }
 
 /*
