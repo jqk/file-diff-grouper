@@ -19,10 +19,11 @@ type Config struct {
 
 // CompareBase defines the information for the base directory in a comparison.
 type CompareBase struct {
-	Dir              string `mapstructure:"dir"`              // Dir is the base directory path to compare.
-	ScanResultFile   string `mapstructure:"scanResultFile"`   // ScanResultFile is the file path for a the scan result. Empty string indicates no need to save the scan result.
-	LoadScanResult   bool   `mapstructure:"loadScanResult"`   // LoadScanResult indicates if the scan result should be loaded. Defaults to false.
-	NeedFullChecksum bool   `mapstructure:"needFullChecksum"` // NeedFullChecksum indicates if full checksums are needed. Defaults to false.
+	Dir                 string `mapstructure:"dir"`                 // Dir is the base directory path to compare.
+	ScanResultFile      string `mapstructure:"scanResultFile"`      // ScanResultFile is the file path for a the scan result. Empty string indicates no need to save the scan result.
+	LoadScanResult      bool   `mapstructure:"loadScanResult"`      // LoadScanResult indicates if the scan result should be loaded. Defaults to false.
+	NeedFullChecksum    bool   `mapstructure:"needFullChecksum"`    // NeedFullChecksum indicates if full checksums are needed. Defaults to false.
+	CompareFullChecksum bool   `mapstructure:"CompareFullChecksum"` // CompareFullChecksum indicates if full checksums should be compared when headerChecksum and file size are equal. Defaults to false.
 }
 
 // CompareTarget defines the information for the target directory in a comparison.
@@ -39,13 +40,14 @@ type CompareTarget struct {
 
 // DirConfig holds the configuration for a directory scan.
 type DirConfig struct {
-	HeaderSize       int               // HeaderSize is the size in bytes to read from the header of each file.
-	BufferSize       int               // BufferSize is the size in bytes of the buffer used when reading files.
-	Dir              string            // Dir is the path to be scanned.
-	ScanResultFile   string            // ScanResultFile is the file path for a the scan result. Empty string indicates no need to save the scan result.
-	LoadScanResult   bool              // LoadScanResult indicates if the scan result should be loaded. Defaults to false.
-	NeedFullChecksum bool              // NeedFullChecksum indicates if full checksums are needed. Defaults to false.
-	Filter           *fileutils.Filter // Filter defines filters to apply for file selection.
+	HeaderSize          int               // HeaderSize is the size in bytes to read from the header of each file.
+	BufferSize          int               // BufferSize is the size in bytes of the buffer used when reading files.
+	Dir                 string            // Dir is the path to be scanned.
+	ScanResultFile      string            // ScanResultFile is the file path for a the scan result. Empty string indicates no need to save the scan result.
+	LoadScanResult      bool              // LoadScanResult indicates if the scan result should be loaded. Defaults to false.
+	NeedFullChecksum    bool              // NeedFullChecksum indicates if full checksums are needed. Defaults to false.
+	CompareFullChecksum bool              // CompareFullChecksum indicates if full checksums should be compared when headerChecksum and file size are equal. Defaults to false.
+	Filter              *fileutils.Filter // Filter defines filters to apply for file selection.
 }
 
 const (
@@ -83,21 +85,23 @@ type Differ interface {
 // getDirConfig parses the Config information and returns the directory information for CompareBase and CompareTarget.
 func getDirConfig(Config *Config) (*DirConfig, *DirConfig) {
 	return &DirConfig{
-			HeaderSize:       Config.HeaderSize,
-			BufferSize:       Config.BufferSize,
-			Dir:              Config.CompareBase.Dir,
-			ScanResultFile:   Config.CompareBase.ScanResultFile,
-			LoadScanResult:   Config.CompareBase.LoadScanResult,
-			NeedFullChecksum: Config.CompareBase.NeedFullChecksum,
-			Filter:           Config.Filter,
+			HeaderSize:          Config.HeaderSize,
+			BufferSize:          Config.BufferSize,
+			Dir:                 Config.CompareBase.Dir,
+			ScanResultFile:      Config.CompareBase.ScanResultFile,
+			LoadScanResult:      Config.CompareBase.LoadScanResult,
+			NeedFullChecksum:    Config.CompareBase.NeedFullChecksum,
+			CompareFullChecksum: Config.CompareBase.CompareFullChecksum,
+			Filter:              Config.Filter,
 		}, &DirConfig{
-			HeaderSize:       Config.HeaderSize,
-			BufferSize:       Config.BufferSize,
-			Dir:              Config.CompareTarget.Dir,
-			ScanResultFile:   Config.CompareTarget.ScanResultFile,
-			LoadScanResult:   Config.CompareTarget.LoadScanResult,
-			NeedFullChecksum: Config.CompareTarget.NeedFullChecksum,
-			Filter:           Config.Filter,
+			HeaderSize:          Config.HeaderSize,
+			BufferSize:          Config.BufferSize,
+			Dir:                 Config.CompareTarget.Dir,
+			ScanResultFile:      Config.CompareTarget.ScanResultFile,
+			LoadScanResult:      Config.CompareTarget.LoadScanResult,
+			NeedFullChecksum:    Config.CompareTarget.NeedFullChecksum,
+			CompareFullChecksum: Config.CompareTarget.CompareFullChecksum,
+			Filter:              Config.Filter,
 		}
 }
 
@@ -121,6 +125,9 @@ func (c *CompareBase) Diff(other Differ) string {
 	}
 	if c.NeedFullChecksum != o.NeedFullChecksum {
 		return "CompareBase.NeedFullChecksum"
+	}
+	if c.CompareFullChecksum != o.CompareFullChecksum {
+		return "CompareBase.CompareFullChecksum"
 	}
 
 	return ""
@@ -164,6 +171,9 @@ func (c *CompareTarget) Diff(other Differ) string {
 	}
 	if c.NeedFullChecksum != o.NeedFullChecksum {
 		return "CompareTarget.NeedFullChecksum"
+	}
+	if c.CompareFullChecksum != o.CompareFullChecksum {
+		return "CompareTarget.CompareFullChecksum"
 	}
 	if c.BackupDir != o.BackupDir {
 		return "CompareTarget.BackupDir"

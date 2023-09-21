@@ -58,12 +58,14 @@ func ScanDir(config *DirConfig, handler FileScanedFunc) (*ScanResult, error) {
 
 	provider := createChecksumProvider()
 	result := &ScanResult{
+		Method:              provider.Method(),
 		HeaderSize:          config.HeaderSize,
 		Dir:                 config.Dir,
+		NeedFullChecksum:    config.NeedFullChecksum,
+		CompareFullChecksum: config.CompareFullChecksum,
 		Filter:              config.Filter,
 		FileCount:           0,
 		FileSize:            0,
-		Method:              provider.Method(),
 		HeaderChecksumCount: 0,
 		FullChecksumCount:   0,
 		ElapsedTime:         0,

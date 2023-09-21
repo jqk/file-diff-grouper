@@ -19,6 +19,7 @@ compareBase:
   scanResultFile: "${dir}/~~~data/base-scan.data.json"
   loadScanResult: true
   needFullChecksum: true
+  CompareFullChecksum: true
 
 compareTarget:
   dir: "test-data/origin/compare_target"
@@ -48,10 +49,11 @@ var expected Config = Config{
 	BufferSize: 10240,
 	Action:     "compare",
 	CompareBase: &CompareBase{
-		Dir:              "test-data/origin/compare_base_0",
-		ScanResultFile:   "${dir}/~~~data/base-scan.data.json",
-		LoadScanResult:   true,
-		NeedFullChecksum: true,
+		Dir:                 "test-data/origin/compare_base_0",
+		ScanResultFile:      "${dir}/~~~data/base-scan.data.json",
+		LoadScanResult:      true,
+		NeedFullChecksum:    true,
+		CompareFullChecksum: true,
 	},
 	CompareTarget: &CompareTarget{
 		Dir:                 "test-data/origin/compare_target",

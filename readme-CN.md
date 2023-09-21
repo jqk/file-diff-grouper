@@ -109,6 +109,11 @@ compareBase:
   loadScanResult: true
   # 是否对待比较的文件进行整个文件摘要的计算。为 false 计算文件头的摘要值。 
   needFullChecksum: false
+  # 当文件头相同，且文件长度也相等时，是否继续比较整个文件的内容。
+  # 如果文件头长度较大，如 10KB，一般情况下，满足前面的条件，即可确定文件内容相同。
+  # 确实不能保证是相同的，但可以大大提高比较速度。
+  # 在 ScanBase 时有效。
+  compareFullChecksum: true
 
 # 待比较的目标路径信息。
 compareTarget:
@@ -129,6 +134,7 @@ compareTarget:
   # 当文件头相同，且文件长度也相等时，是否继续比较整个文件的内容。
   # 如果文件头长度较大，如 10KB，一般情况下，满足前面的条件，即可确定文件内容相同。
   # 确实不能保证是相同的，但可以大大提高比较速度。
+  # 在 ScanTarget 和 Compare 时有效。
   compareFullChecksum: false
   # 保存比较结果的路径，必须是可写的。而且，必需是无需复制，能直接从 dir 移动文件的路径。
   # 可以指定相对或绝对路径。也可以通过 ${dir} 引用 dir 定义的路径。
@@ -253,6 +259,8 @@ filter:
     "Method": "CRC64-ISO",
     "HeaderSize": 2000,
     "Dir": "test-data/origin/compare_base",
+    "NeedFullChecksum": false,
+    "CompareFullChecksum": false,
     "Filter": {
         "CaseSensitive": false,
         "Include": [

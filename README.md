@@ -112,6 +112,11 @@ compareBase:
   # Whether to compute full file digests for the files being compared. 
   # False means computing digest of file header only.
   needFullChecksum: false
+  # When the file headers are the same and the file lengths are also same, whether to continue comparing the entire file contents.
+  # If the file header length is large, such as 10KB, in general, meeting the preceding conditions can determine that the file contents are the same. 
+  # It cannot be guaranteed to be the same, but it can greatly improve the comparison speed.
+  # Only works in ScanBase mode.
+  compareFullChecksum: false
 
 # 待比较的目标路径信息。
 compareTarget:
@@ -126,6 +131,7 @@ compareTarget:
   # When the file headers are the same and the file lengths are also same, whether to continue comparing the entire file contents.
   # If the file header length is large, such as 10KB, in general, meeting the preceding conditions can determine that the file contents are the same. 
   # It cannot be guaranteed to be the same, but it can greatly improve the comparison speed.
+  # Works in ScanTarget and Compare mode.
   compareFullChecksum: false
   # Path to save the comparison results, must be writable. 
   # Can be a relative or absolute path. Can also reference the path defined in above using ${dir}.
@@ -249,6 +255,8 @@ The scan results are saved in `JSON` format, with content like below:
     "Method": "CRC64-ISO",
     "HeaderSize": 2000,
     "Dir": "test-data/origin/compare_base",
+    "NeedFullChecksum": false,
+    "CompareFullChecksum": false,
     "Filter": {
         "CaseSensitive": false,
         "Include": [

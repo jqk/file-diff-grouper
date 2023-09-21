@@ -35,6 +35,8 @@ type ScanResult struct {
 	Method              string            // Algorithm name
 	HeaderSize          int               // HeaderSize is the size of the header read from each file.
 	Dir                 string            // Dir is the directory path that was scanned.
+	NeedFullChecksum    bool              // NeedFullChecksum indicates if full checksums are needed. Defaults to false.
+	CompareFullChecksum bool              // CompareFullChecksum indicates if full checksums should be compared when headerChecksum and file size are equal. Defaults to false.
 	Filter              *fileutils.Filter // Filter is the filter used to select files to scan.
 	FullChecksumChanged bool              `json:"-"` // FullChecksumChanged indicates if any full checksums changed.
 	FileCount           int               // FileCount is the number of files scanned.
@@ -85,6 +87,9 @@ func (f *FileIdentity) Diff(other Differ) string {
 func (r *ScanResult) Diff(other Differ) string {
 	o := other.(*ScanResult)
 
+	if r.Method != o.Method {
+		return "ScanResult.Method"
+	}
 	if r.HeaderSize != o.HeaderSize {
 		return "ScanResult.HeaderSize"
 	}
