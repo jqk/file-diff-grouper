@@ -67,7 +67,7 @@ There are no specific requirements for the configuration filename itself, but it
 $ fdg
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file difference grouper (fdg) 0.10.0, 2023-09-18
+file difference grouper (fdg) 1.0.0, 2023-09-21
 
 Usage:
   fdg [path/to/the/taskConfigFile]
@@ -85,9 +85,9 @@ You don't need to read through in detail at first. Each parameter in the configu
 
 ```yaml {.line-numbers}
 # The number of bytes read from each file header for calculating checksum during quick scan. 
-headerSize: 1024
+headerSize: 40960
 # The buffer size in bytes for reading files. It must be greater than or equal to HeaderSize. 
-bufferSize: 10240
+bufferSize: 102400
 
 # Action to perform, case insensitive, must be one of: 
 # - Compare: Compare compareBase and compareTarget.
@@ -162,6 +162,16 @@ filter:
   # File extensions to exclude, can be left empty.
   exclude:
     - "*.log"
+    - "*.cs"
+    - "*.resx"
+    - "*.java"
+    - "*.js"
+    - "*.c"
+    - "*.txvpck"
+    - "*.csproj"
+    - "*.class"
+    - "*.cpp"
+    - "*.css"
 
   # Minimum file size in bytes, 0 or less means no limit, 
   # but will process starting from 1 byte, 0 byte files are skipped.
@@ -236,6 +246,7 @@ The scan results are saved in `JSON` format, with content like below:
 
 ```json {.line-numbers}
 {
+    "Method": "CRC64-ISO",
     "HeaderSize": 2000,
     "Dir": "test-data/origin/compare_base",
     "Filter": {
@@ -252,9 +263,11 @@ The scan results are saved in `JSON` format, with content like below:
     },
     "FileCount": 5,
     "FileSize": 9668,
-    "Method": "CRC64-ISO",
     "HeaderChecksumCount": 3,
     "FullChecksumCount": 4,
+    "DupGroupCount": 1,
+    "DupFileCount": 2,
+    "DupFileSize": 3868,
     "ElapsedTime": 509700,
     "Files": {
         "+jj4D1tJbDk=": [
@@ -324,6 +337,7 @@ The two result files have the same structure, for example:
 
 ```json {.line-numbers}
 {
+    "Method": "CRC64-ISO",
     "BaseDir": "test-data/origin/compare_base",
     "BaseFileCount": 6,
     "BaseHeaderChecksumCount": 4,
@@ -342,6 +356,7 @@ The two result files have the same structure, for example:
         "MinFileSize": 1024,
         "MaxFileSize": 1048576
     },
+    "CompareFullChecksum": true,
     "CompareResultType": "more",
     "ResultFileCount": 2,
     "ResultFileSize": 35879,

@@ -67,7 +67,7 @@ fdg c:\test\config.yaml
 $ fdg
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file difference grouper (fdg) 0.10.0, 2023-09-18
+file difference grouper (fdg) 1.0.0, 2023-09-21
 
 Usage:
   fdg [path/to/the/taskConfigFile]
@@ -85,9 +85,9 @@ See <https://github.com/jqk/file-diff-grouper> for more information.
 
 ```yaml {.line-numbers}
 # 快速扫描时读取各个文件头用于计算摘要的字节长度。
-headerSize: 1024
+headerSize: 40960
 # 文件读取缓冲区字节长度，必须大于等于 HeaderSize。
-bufferSize: 10240
+bufferSize: 102400
 
 # 待执行的操作，大小写不敏感，只能是以下三种之一：
 # - Compare：比较 compareBase 和 compareTarget。
@@ -162,6 +162,16 @@ filter:
   # 排除的文件扩展名，可以不提供。
   exclude:
     - "*.log"
+    - "*.cs"
+    - "*.resx"
+    - "*.java"
+    - "*.js"
+    - "*.c"
+    - "*.txvpck"
+    - "*.csproj"
+    - "*.class"
+    - "*.cpp"
+    - "*.css"
 
   # 文件字节最小长度小于等于 0 表示不限制，但至少会从 1 字节开始，0 字节不处理。
   minFileSize: 1024
@@ -240,6 +250,7 @@ filter:
 
 ```json {.line-numbers}
 {
+    "Method": "CRC64-ISO",
     "HeaderSize": 2000,
     "Dir": "test-data/origin/compare_base",
     "Filter": {
@@ -256,9 +267,11 @@ filter:
     },
     "FileCount": 5,
     "FileSize": 9668,
-    "Method": "CRC64-ISO",
     "HeaderChecksumCount": 3,
     "FullChecksumCount": 4,
+    "DupGroupCount": 1,
+    "DupFileCount": 2,
+    "DupFileSize": 3868,
     "ElapsedTime": 509700,
     "Files": {
         "+jj4D1tJbDk=": [
@@ -328,6 +341,7 @@ filter:
 
 ```json {.line-numbers}
 {
+    "Method": "CRC64-ISO",
     "BaseDir": "test-data/origin/compare_base",
     "BaseFileCount": 6,
     "BaseHeaderChecksumCount": 4,
@@ -346,6 +360,7 @@ filter:
         "MinFileSize": 1024,
         "MaxFileSize": 1048576
     },
+    "CompareFullChecksum": true,
     "CompareResultType": "more",
     "ResultFileCount": 2,
     "ResultFileSize": 35879,

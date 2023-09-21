@@ -27,6 +27,7 @@ type FileGroup struct {
 CompareRsult represents the compare result of files in target dir but not in base dir.
 */
 type CompareResult struct {
+	Method                    string            // Algorithm name
 	BaseDir                   string            // Base directory path
 	BaseFileCount             int               // Number of files in base directory
 	BaseHeaderChecksumCount   int               // Number of header checksums calculated for base files
@@ -51,6 +52,7 @@ func createCompareResult(
 	fileGroup *FileGroup,
 ) *CompareResult {
 	return &CompareResult{
+		Method:                    baseScanResult.Method, // baseScanResult.Method 和 targetScanResult.Method 是相同的。
 		BaseDir:                   config.CompareBase.Dir,
 		BaseFileCount:             baseScanResult.FileCount,
 		BaseHeaderChecksumCount:   baseScanResult.HeaderChecksumCount,

@@ -89,7 +89,7 @@ func showScanResult(result *filediff.ScanResult, config *filediff.Config, result
 	fmt.Printf("FullChecksum count   : %d\n", result.FullChecksumCount)
 	fmt.Printf("Duplicate group count: %d\n", result.DupGroupCount)
 	fmt.Printf("Duplicate file count : %d\n", result.DupFileCount)
-	fmt.Printf("Duplicate file size  : %d\n", result.DupFileSize)
+	fmt.Printf("Duplicate file size  : %s\n", common.ToSizeString(result.DupFileSize))
 	fmt.Printf("Time elapsed         : %s\n\n", result.ElapsedTime)
 }
 
