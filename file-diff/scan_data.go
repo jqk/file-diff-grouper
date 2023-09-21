@@ -32,13 +32,13 @@ type FileIdentities map[string][]*FileIdentity
 
 // ScanResult is the result of a scanning a given directory.
 type ScanResult struct {
+	Method              string            // Algorithm name
 	HeaderSize          int               // HeaderSize is the size of the header read from each file.
 	Dir                 string            // Dir is the directory path that was scanned.
 	Filter              *fileutils.Filter // Filter is the filter used to select files to scan.
 	FullChecksumChanged bool              `json:"-"` // FullChecksumChanged indicates if any full checksums changed.
 	FileCount           int               // FileCount is the number of files scanned.
 	FileSize            int64             // FileSize is the total size of all files scanned.
-	Method              string            // Algorithm name
 	HeaderChecksumCount int               // HeaderChecksumCount is the number of header checksums calculated.
 	FullChecksumCount   int               // FullChecksumCount is the number of full checksums calculated.
 	DupFileCount        int               // DupFileCount is the number of files with duplicate header checksums and file sizes.

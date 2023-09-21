@@ -11,14 +11,8 @@ import (
 )
 
 const (
-	/**
-	CompareResultMore indicates the files are in Target Dir but in Base Dir.
-	*/
-	CompareResultMore = "more"
-	/**
-	CompareResultSame indicates the files taht exist in both Target Dir and Base Dir.
-	*/
-	CompareResultSame = "same"
+	CompareResultMore = "more" // CompareResultMore indicates the files are in Target Dir but in Base Dir.
+	CompareResultSame = "same" // CompareResultSame indicates the files taht exist in both Target Dir and Base Dir.
 )
 
 /*
@@ -40,6 +34,7 @@ type CompareResult struct {
 	TargetFileCount           int               // Number of files in target directory
 	TargetHeaderChecksumCount int               // Number of header checksums for target files
 	Filter                    *fileutils.Filter // Filter used during comparison
+	CompareFullChecksum       bool              // CompareFullChecksum indicates if full checksums should be compared when headerChecksum and file size are equal.
 	CompareResultType         string            // Type of comparison result - "More/Same"
 	ResultFileCount           int               // Number of result files, just for saving the result, same as len(FileGroup.Files)
 	ResultFileSize            int64             // Total size of result files, just for saving the result, same as FileGroup.Size
@@ -63,6 +58,7 @@ func createCompareResult(
 		TargetFileCount:           targetScanResult.FileCount,
 		TargetHeaderChecksumCount: targetScanResult.HeaderChecksumCount,
 		Filter:                    config.Filter,
+		CompareFullChecksum:       config.CompareTarget.CompareFullChecksum,
 		CompareResultType:         compareResultType,
 		ElapsedTime:               elapsedTime,
 		FileGroup:                 fileGroup,
