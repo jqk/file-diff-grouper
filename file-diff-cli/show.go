@@ -5,28 +5,38 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/gookit/color"
 	"github.com/jqk/futool4go/common"
 )
 
+var blue color.Style = color.New(color.LightBlue)
+var green color.Style = color.New(color.LightGreen)
+var white color.Style = color.New(color.White)
+var yellow color.Style = color.New(color.LightYellow)
+
 func showVersion() {
-	fmt.Println()
-	fmt.Println("Copyright (c) 1999-2023 Not a dream Co., Ltd.")
-	fmt.Println("file difference grouper (fdg) 1.1.0, 2023-09-23")
-	fmt.Println()
+	white.Println("\nCopyright (c) 1999-2023 Not a dream Co., Ltd.")
+	white.Print("file difference grouper (")
+	blue.Print("fdg")
+	white.Print(") 1.1.0, 2023-09-23\n\n")
 }
 
 func showHelp() {
-	fmt.Println("Usage:")
-	fmt.Println("  fdg [path/to/configFile]")
-	fmt.Println("      Compare and group the file differences according to specified config file.")
-	fmt.Println()
-	fmt.Println("Otherwise: show this help.")
-	fmt.Println("See <https://github.com/jqk/file-diff-grouper> for more information.")
+	yellow.Println("Usage:")
+	yellow.Println("  fdg [path/to/configFile]")
+	white.Println("      Compare and group the file differences according to specified config file.")
+	white.Println()
+	white.Println("Otherwise: show this help.")
+	white.Print("See <")
+	yellow.Print("https://github.com/jqk/file-diff-grouper")
+	white.Println("> for more information.")
 	fmt.Println()
 }
 
 func showError(header string, err error, includingHelp bool) {
-	fmt.Printf("%s: %s\n", header, err)
+	white.Printf("%s: ", header)
+	color.Errorf("%s", err)
+	fmt.Println()
 
 	if includingHelp {
 		showHelp()
@@ -41,30 +51,44 @@ func showGroupResult(result *filediff.GroupResult, config *filediff.Config) {
 	baseDir, _ := filepath.Abs(result.More.BaseDir)
 	targetDir, _ := filepath.Abs(result.More.TargetDir)
 
-	fmt.Printf("Action: %s\n\n", config.Action)
+	green.Print("Action: ")
+	yellow.Printf("%s\n\n", config.Action)
 
-	fmt.Printf("Base   Dir         : %s\n", baseDir)
-	fmt.Printf("Target Dir         : %s\n", targetDir)
-	fmt.Printf("Header size        : %d\n", config.HeaderSize)
-	fmt.Printf("CompareFullChecksum: %t\n", config.CompareTarget.CompareFullChecksum)
-	fmt.Printf("Base file count    : %d\n", result.More.BaseFileCount)
-	fmt.Printf("Target file count  : %d\n", result.More.TargetFileCount)
-	fmt.Printf("More file count    : %d\n", len(result.More.FileGroup.Files))
-	fmt.Printf("More file size     : %s\n", common.ToSizeString(result.More.FileGroup.Size))
-	fmt.Printf("Same file count    : %d\n", len(result.Same.FileGroup.Files))
-	fmt.Printf("Same file size     : %s\n", common.ToSizeString(result.Same.FileGroup.Size))
-	fmt.Printf("Time elapsed       : %s\n", result.ElapsedTime)
+	green.Print("Base   Dir         : ")
+	yellow.Printf("%s\n", baseDir)
+	green.Print("Target Dir         : ")
+	yellow.Printf("%s\n", targetDir)
+	green.Print("Header size        : ")
+	yellow.Printf("%d\n", config.HeaderSize)
+	green.Print("CompareFullChecksum: ")
+	yellow.Printf("%t\n", config.CompareTarget.CompareFullChecksum)
+	green.Print("Base file count    : ")
+	yellow.Printf("%d\n", result.More.BaseFileCount)
+	green.Print("Target file count  : ")
+	yellow.Printf("%d\n", result.More.TargetFileCount)
+	green.Print("More file count    : ")
+	yellow.Printf("%d\n", len(result.More.FileGroup.Files))
+	green.Print("More file size     : ")
+	yellow.Printf("%s\n", common.ToSizeString(result.More.FileGroup.Size))
+	green.Print("Same file count    : ")
+	yellow.Printf("%d\n", len(result.Same.FileGroup.Files))
+	green.Print("Same file size     : ")
+	yellow.Printf("%s\n", common.ToSizeString(result.Same.FileGroup.Size))
+	green.Print("Time elapsed       : ")
+	yellow.Printf("%s\n", result.ElapsedTime)
 
 	if config.CompareTarget.MoveMore {
-		fmt.Printf("Move MORE files to : %s\n", result.MoreDir)
+		green.Print("Move MORE files to : ")
+		yellow.Printf("%s\n", result.MoreDir)
 	} else {
-		fmt.Println("Moving MORE files  : not required.")
+		green.Println("Moving MORE files : not required.")
 	}
 
 	if config.CompareTarget.MoveSame {
-		fmt.Printf("Move SAME files to : %s\n", result.SameDir)
+		green.Print("Move SAME files to : ")
+		yellow.Printf("%s\n", result.SameDir)
 	} else {
-		fmt.Println("Moving SAME files  : not required.")
+		green.Println("Moving SAME files  : not required.")
 	}
 
 	fmt.Println()
@@ -72,30 +96,46 @@ func showGroupResult(result *filediff.GroupResult, config *filediff.Config) {
 
 func showScanResult(result *filediff.ScanResult, config *filediff.Config, resultFilename string) {
 	if progressShowed {
-		fmt.Println()
+		green.Println()
 	}
 	dir, _ := filepath.Abs(result.Dir)
 
-	fmt.Printf("Action: %s\n\n", config.Action)
+	green.Print("Action ")
+	yellow.Printf("%s\n\n", config.Action)
 
-	fmt.Printf("Method               : %s\n", result.Method)
-	fmt.Printf("Header size          : %d\n", config.HeaderSize)
-	fmt.Printf("Scan dir             : %s\n", dir)
+	green.Print("Method               : ")
+	yellow.Printf("%s\n", result.Method)
+	green.Print("Header size          : ")
+	yellow.Printf("%d\n", config.HeaderSize)
+	green.Print("Scan dir             : ")
+	yellow.Printf("%s\n", dir)
 	resultFilename, _ = filepath.Abs(resultFilename)
-	fmt.Printf("Scan result file     : %s\n", resultFilename)
-	fmt.Printf("Scan file count      : %d\n", result.FileCount)
-	fmt.Printf("Scan file size       : %s\n", common.ToSizeString(result.FileSize))
-	fmt.Printf("HeaderChecksum count : %d\n", result.HeaderChecksumCount)
-	fmt.Printf("FullChecksum count   : %d\n", result.FullChecksumCount)
-	fmt.Printf("Duplicate group count: %d\n", result.DupGroupCount)
-	fmt.Printf("Duplicate file count : %d\n", result.DupFileCount)
-	fmt.Printf("Duplicate file size  : %s\n", common.ToSizeString(result.DupFileSize))
-	fmt.Printf("Time elapsed         : %s\n\n", result.ElapsedTime)
+	green.Print("Scan result file     : ")
+	yellow.Printf("%s\n", resultFilename)
+	green.Print("Scan file count      : ")
+	yellow.Printf("%d\n", result.FileCount)
+	green.Print("Scan file size       : ")
+	yellow.Printf("%s\n", common.ToSizeString(result.FileSize))
+	green.Print("HeaderChecksum count : ")
+	yellow.Printf("%d\n", result.HeaderChecksumCount)
+	green.Print("FullChecksum count   : ")
+	yellow.Printf("%d\n", result.FullChecksumCount)
+	green.Print("Duplicate group count: ")
+	yellow.Printf("%d\n", result.DupGroupCount)
+	green.Print("Duplicate file count : ")
+	yellow.Printf("%d\n", result.DupFileCount)
+	green.Print("Duplicate file size  : ")
+	yellow.Printf("%s\n", common.ToSizeString(result.DupFileSize))
+	green.Print("Time elapsed         : ")
+	yellow.Printf("%s\n", result.ElapsedTime)
+
+	fmt.Println()
 }
 
 var progressShowed = false
 
 func showScanProgress(count int) {
 	progressShowed = true
-	fmt.Printf("File scaned: %d\n", count)
+	white.Print("File scaned: ")
+	green.Printf("%d\n", count)
 }

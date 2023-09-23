@@ -7,7 +7,7 @@ bufferSize: 10240
 # - Compare: Compare compareBase and compareTarget.
 # - ScanBase: Only scan compareBase.
 # - ScanTarget: Only scan compareTarget.
-action: "Compare"
+action: "ScanTarget"
 
 # Base path information for comparison.
 compareBase:
@@ -35,11 +35,11 @@ compareBase:
 compareTarget:
   # Compare target path. Can be read-only if not doing moveMore and moveSame operations below.
   # Otherwise must be writable.
-  dir: "z:/compare_target"
+  dir: "e:/temp"
   # Same as attributes defined in compareBase.
   scanResultFile: "z:/result/target.scan.json"
   loadScanResult: true
-  needFullChecksum: false
+  needFullChecksum: true
 
   # When the file headers are the same and the file lengths are also same, whether to continue comparing the entire file contents.
   # If the file header length is large, such as 10KB, in general, meeting the preceding conditions can determine that the file contents are the same. 
@@ -64,19 +64,20 @@ filter:
   # Empty string means files without extension.
   # The include in this example covers major image and video extensions for phones and cameras.
   include:
-    - "*.3gp"
-    - "*.amr"
-    - "*.avi"
-    - "*.bmp"
-    - "*.gif"
-    - "*.jpeg"
-    - "*.jpg"
-    - "*.mov"
-    - "*.mp4"
-    - "*.mpg"
-    - "*.png"
-    - "*.webp"
-    - "*.wmv"
+    - "*.*"
+  #  - "*.3gp"
+  #  - "*.amr"
+  #  - "*.avi"
+  #  - "*.bmp"
+  #  - "*.gif"
+  #  - "*.jpeg"
+  #  - "*.jpg"
+  #  - "*.mov"
+  #  - "*.mp4"
+  #  - "*.mpg"
+  #  - "*.png"
+  #  - "*.webp"
+  #  - "*.wmv"
 
   # File extensions to exclude, can be left empty.
   exclude:
