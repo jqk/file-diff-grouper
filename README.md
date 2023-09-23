@@ -67,7 +67,7 @@ There are no specific requirements for the configuration filename itself, but it
 $ fdg
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file difference grouper (fdg) 1.0.0, 2023-09-21
+file difference grouper (fdg) 1.1.0, 2023-09-23
 
 Usage:
   fdg [path/to/the/taskConfigFile]
@@ -238,9 +238,11 @@ Setting `needFullChecksum` to true is useful in the scenario where there is a la
 
 > For example, I have a USB drive with about 50,000 files totaling 300GB. After scanning it with `needFullChecksum` set to true and getting the result file `result.json`, I can then compare files on the USB drive with others using only `result.json` without connecting the USB drive.
 
-When `compareFullChecksum` is false, it only compares the `headerChecksum` and file length. Avoiding reading the entire file will greatly improve the comparison speed. 
+When `compareFullChecksum` is false, it only compares the `headerChecksum` and file length. Avoiding reading the entire file will greatly improve the comparison speed.
 
 > When the file lengths are the same, and the first 10KB or 100KB are exactly the same, what is the probability that the entire files are different?
+
+When comparing two directories, if both `base` and `target`'s `compareFullChecksum` are true, then `fdg` will continue to compare the `fullChecksum` when `headerChecksum` and file length are the same. If `fullChecksum` is not valid, it will attempt to generate it. If either `base` or `target`'s `compareFullChecksum` is false, then only the `headerChecksum` and file length will be used as the comparison criteria.
 
 #### 4.3.4 loadScanResult & scanResultFile
 
@@ -328,7 +330,25 @@ The scan results are saved in `JSON` format, with content like below:
 }
 ```
 
-The checksum is stored in `base64` format.
+Before `FileCount`, it is some configuration information corresponding to the scan results:
+
+- FileCount: Number of scanned files, related to the `filter` in the configuration file.
+- FileSize: Total byte length of scanned files.
+- HeaderChecksumCount: Number of unique file header checksums.
+- FullChecksumCount: Number of full checksums.
+- DupGroupCount: Number of duplicate file groups. Each group has at least two files that are ***identical***.
+- DupFileCount": Number of duplicate files. For example, if 3 completely identical files are found, this value is 2.
+- DupFileSize": Total byte length of duplicate files.
+- ElapsedTime": Scan elapsed time, in nanoseconds.
+
+Files is the scan content for each file, grouped by headerChecksum:
+
+- HeaderChecksum: File header checksum, saved in `base64` format.
+- HasFullChecksum: Whether fullChecksum is valid.
+- FullChecksum: File full checksum, saved in `base64` format.
+- Filename: Full path of the file.
+- FileSize: Byte length of the file.
+- ModifiedTime: File modification time.
 
 #### 4.3.5 backupDir
 

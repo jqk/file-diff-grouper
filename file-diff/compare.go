@@ -47,7 +47,6 @@ func CompareDirs(config *Config, handler FileScanedFunc) (resultMore *CompareRes
 			targetScanResult,
 			config.HeaderSize,
 			config.BufferSize,
-			config.CompareTarget.CompareFullChecksum,
 		)
 
 		return err
@@ -166,7 +165,6 @@ func compareScanResults(
 	target *ScanResult,
 	headerSize,
 	bufferSize int,
-	compareFullChecksum bool,
 ) (more, same *FileGroup, err error) {
 
 	provider := createChecksumProvider()
@@ -184,17 +182,20 @@ func compareScanResults(
 
 				for _, baseFile := range baseFiles {
 					if baseFile.FileSize == targetFile.FileSize { // 文件大小相同才有继续比较的意义。
-						if !compareFullChecksum {
-							if baseFile.HasFullChecksum && targetFile.HasFullChecksum {
-								// 有 FullChecksum，直接比较。
-								foundSame = reflect.DeepEqual(baseFile.FullChecksum, targetFile.FullChecksum)
-							} else { // HeaderChecksum 相同且文件长度相同，但缺少 FullChecksum，粗略认为两者相同。
-								foundSame = true
-							}
-							break
+						// 两者均有 FullChecksum，无论 compareFullChecksum 如何设定，均要比较 FullChecksum。
+						if baseFile.HasFullChecksum && targetFile.HasFullChecksum {
+							foundSame = reflect.DeepEqual(baseFile.FullChecksum, targetFile.FullChecksum)
+							continue // 在此处不使用 break，是为了检查是否有许多文件相同。
 						}
 
-						// compareFullChecksum 为 true，则要继续对比 FullChecksum。首先确保 FullChecksum 有效。
+						if !base.CompareFullChecksum || !target.CompareFullChecksum {
+							// HeaderChecksum 相同且文件长度相同，但缺少 FullChecksum，粗略认为两者相同。
+							foundSame = true
+							continue
+						}
+
+						// base.CompareFullChecksum 和 target.CompareFullChecksum 都为 true，才要继续对比 FullChecksum。
+						// 此时，首先确保 FullChecksum 有效。
 						if err = ensureFullChecksumReady(base, baseFile, headerSize, buffer, provider); err != nil {
 							return // nil, nil, err
 						}
@@ -203,7 +204,7 @@ func compareScanResults(
 						}
 						if reflect.DeepEqual(baseFile.FullChecksum, targetFile.FullChecksum) {
 							foundSame = true
-							break
+							continue
 						}
 					}
 				}

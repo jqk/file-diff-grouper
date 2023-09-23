@@ -67,7 +67,7 @@ fdg c:\test\config.yaml
 $ fdg
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file difference grouper (fdg) 1.0.0, 2023-09-21
+file difference grouper (fdg) 1.1.0, 2023-09-23
 
 Usage:
   fdg [path/to/the/taskConfigFile]
@@ -242,9 +242,11 @@ filter:
 
 > 例如，我有个 U 盘，上面有约 5 万个文件，共约 300GB。将 `needFullChecksum` 设置为 true 扫描后得到结果文件 `result.json`。以后我可以只使用 `result.json` 而不必连接该 U 盘即能完成针对该 U 盘上文件的比较。
 
-`compareFullChecksum` 为 false 时只比较 `headerChecksum` 和文件长度。避免读取整个文件将大大提高比较效率。
+`compareFullChecksum` 为 false 时只要两个文件的 `headerChecksum` 和文件长度相同，则粗略认为这两个文件是相同的。这样可避免读取整个文件，将有效提高比较效率，但准确度稍差。
 
 > 当文件长度相同，且前面 10KB 或 100KB 完全相同，又有多大概率整个文件是不同的呢？
+
+在比较两个目录时，若 `base` 和 `target` 的 `compareFullChecksum` 都为 true，则 `fdg` 会在 `headerChecksum` 和文件长度都相同时，继续比较 `fullChecksum`。若 `fullChecksum` 未生效，则会尝试生成。若 `base` 和 `target` 中有一个的 `compareFullChecksum` 为 false，则只会以 `headerChecksum` 和文件长度为比较依据。
 
 #### 4.3.4 loadScanResult 和 scanResultFile
 
@@ -332,7 +334,25 @@ filter:
 }
 ```
 
-校验和以 `base64` 格式保存。
+在 `FileCount` 之前，是扫描结果对应的部分配置信息：
+
+- FileCount: 扫描文件的数量，与配置文件的 `filter` 有关。
+- FileSize: 扫描文件总的字节长度。
+- HeaderChecksumCount: 不重复的文件头校验和的数量。
+- FullChecksumCount: 整体校验和的数量。
+- DupGroupCount: 重复的文件组数量。每组中至少有两个文件是**相同**的。
+- DupFileCount": 重复文件数量。例如找到了 3 个完全一样的文件，则本值为 2。
+- DupFileSize": 重复文件总的字节长度。
+- ElapsedTime": 扫描耗时，纳秒。
+
+`Files` 是每个文件的扫描内容，以 headerChecksum 分组：
+
+- HeaderChecksum: 文件头校验和，以 `base64` 格式保存。
+- HasFullChecksum: fullChecksum 是否有效。
+- FullChecksum: 文件整体校验和，以 `base64` 格式保存。
+- Filename: 文件的完整路径。
+- FileSize: 文件的字节长度。
+- ModifiedTime: 文件的修改时间。
 
 #### 4.3.5 backupDir
 

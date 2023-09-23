@@ -18,6 +18,8 @@ compareBase:
   scanResultFile: "test-data/output/compare-test-base.scan.json"
   loadScanResult: false
   needFullChecksum: false
+  # 两个 compareFullChecksum 都为 ture，会导致比较时进一步计算 FullChecksum。
+  compareFullChecksum: true
 
 compareTarget:
   dir: "test-data/origin/compare_target"
