@@ -13,12 +13,15 @@ var blue color.Style = color.New(color.LightBlue)
 var green color.Style = color.New(color.LightGreen)
 var white color.Style = color.New(color.White)
 var yellow color.Style = color.New(color.LightYellow)
+var red color.Style = color.New(color.LightRed)
 
 func showVersion() {
 	white.Println("\nCopyright (c) 1999-2023 Not a dream Co., Ltd.")
 	white.Print("file difference grouper (")
 	blue.Print("fdg")
-	white.Print(") 1.1.0, 2023-09-23\n\n")
+	white.Print(") ")
+	red.Print("1.1.0")
+	white.Print(", 2023-09-23\n\n")
 }
 
 func showHelp() {
@@ -98,7 +101,6 @@ func showScanResult(result *filediff.ScanResult, config *filediff.Config, result
 	if progressShowed {
 		green.Println()
 	}
-	dir, _ := filepath.Abs(result.Dir)
 
 	green.Print("Action ")
 	yellow.Printf("%s\n\n", config.Action)
@@ -106,8 +108,13 @@ func showScanResult(result *filediff.ScanResult, config *filediff.Config, result
 	green.Print("Method               : ")
 	yellow.Printf("%s\n", result.Method)
 	green.Print("Header size          : ")
-	yellow.Printf("%d\n", config.HeaderSize)
+	yellow.Printf("%d\n", result.HeaderSize)
+	green.Print("Need full checksum   : ")
+	yellow.Printf("%t\n", result.NeedFullChecksum)
+	green.Print("Compare full checksum: ")
+	yellow.Printf("%t\n", result.CompareFullChecksum)
 	green.Print("Scan dir             : ")
+	dir, _ := filepath.Abs(result.Dir)
 	yellow.Printf("%s\n", dir)
 	resultFilename, _ = filepath.Abs(resultFilename)
 	green.Print("Scan result file     : ")
