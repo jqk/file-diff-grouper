@@ -20,8 +20,8 @@ func showVersion() {
 	white.Print("file difference grouper (")
 	blue.Print("fdg")
 	white.Print(") ")
-	red.Print("1.1.0")
-	white.Print(", 2023-09-23\n\n")
+	red.Print("1.1.1")
+	white.Print(", 2023-09-25\n\n")
 }
 
 func showHelp() {
@@ -53,6 +53,9 @@ func showGroupResult(result *filediff.GroupResult, config *filediff.Config) {
 
 	baseDir, _ := filepath.Abs(result.More.BaseDir)
 	targetDir, _ := filepath.Abs(result.More.TargetDir)
+	backupDir, _ := filepath.Abs(config.CompareTarget.BackupDir)
+	moreFileCount := len(result.More.FileGroup.Files)
+	sameFileCount := len(result.Same.FileGroup.Files)
 
 	green.Print("Action: ")
 	yellow.Printf("%s\n\n", config.Action)
@@ -63,33 +66,40 @@ func showGroupResult(result *filediff.GroupResult, config *filediff.Config) {
 	yellow.Printf("%s\n", targetDir)
 	green.Print("Header size        : ")
 	yellow.Printf("%d\n", config.HeaderSize)
-	green.Print("CompareFullChecksum: ")
-	yellow.Printf("%t\n", config.CompareTarget.CompareFullChecksum)
 	green.Print("Base file count    : ")
 	yellow.Printf("%d\n", result.More.BaseFileCount)
 	green.Print("Target file count  : ")
 	yellow.Printf("%d\n", result.More.TargetFileCount)
 	green.Print("More file count    : ")
-	yellow.Printf("%d\n", len(result.More.FileGroup.Files))
+	yellow.Printf("%d\n", moreFileCount)
 	green.Print("More file size     : ")
 	yellow.Printf("%s\n", common.ToSizeString(result.More.FileGroup.Size))
 	green.Print("Same file count    : ")
-	yellow.Printf("%d\n", len(result.Same.FileGroup.Files))
+	yellow.Printf("%d\n", sameFileCount)
 	green.Print("Same file size     : ")
 	yellow.Printf("%s\n", common.ToSizeString(result.Same.FileGroup.Size))
 	green.Print("Time elapsed       : ")
 	yellow.Printf("%s\n", result.ElapsedTime)
-
+	green.Print("Backup Dir         : ")
+	yellow.Printf("%s\n", backupDir)
 	if config.CompareTarget.MoveMore {
-		green.Print("Move MORE files to : ")
-		yellow.Printf("%s\n", result.MoreDir)
+		if moreFileCount == 0 {
+			green.Println("Moving MORE files  : nothing to move.")
+		} else {
+			green.Print("Move MORE files to : ")
+			yellow.Printf("%s\n", result.MoreDir)
+		}
 	} else {
-		green.Println("Moving MORE files : not required.")
+		green.Println("Moving MORE files  : not required.")
 	}
 
 	if config.CompareTarget.MoveSame {
-		green.Print("Move SAME files to : ")
-		yellow.Printf("%s\n", result.SameDir)
+		if sameFileCount == 0 {
+			green.Println("Moving SAME files  : nothing to move.")
+		} else {
+			green.Print("Move SAME files to : ")
+			yellow.Printf("%s\n", result.SameDir)
+		}
 	} else {
 		green.Println("Moving SAME files  : not required.")
 	}
@@ -105,6 +115,9 @@ func showScanResult(result *filediff.ScanResult, config *filediff.Config, result
 	green.Print("Action ")
 	yellow.Printf("%s\n\n", config.Action)
 
+	dir, _ := filepath.Abs(result.Dir)
+	resultFilename, _ = filepath.Abs(resultFilename)
+
 	green.Print("Method               : ")
 	yellow.Printf("%s\n", result.Method)
 	green.Print("Header size          : ")
@@ -114,9 +127,7 @@ func showScanResult(result *filediff.ScanResult, config *filediff.Config, result
 	green.Print("Compare full checksum: ")
 	yellow.Printf("%t\n", result.CompareFullChecksum)
 	green.Print("Scan dir             : ")
-	dir, _ := filepath.Abs(result.Dir)
 	yellow.Printf("%s\n", dir)
-	resultFilename, _ = filepath.Abs(resultFilename)
 	green.Print("Scan result file     : ")
 	yellow.Printf("%s\n", resultFilename)
 	green.Print("Scan file count      : ")

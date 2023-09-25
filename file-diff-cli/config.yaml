@@ -7,12 +7,14 @@ bufferSize: 10240
 # - Compare: Compare compareBase and compareTarget.
 # - ScanBase: Only scan compareBase.
 # - ScanTarget: Only scan compareTarget.
-action: "ScanTarget"
+#action: "ScanTarget"
+#action: "ScanBase"
+action: "Compare"
 
 # Base path information for comparison.
 compareBase:
   # Compare base path. Can be read-only.
-  dir: "z:/compare_base"
+  dir: "z:/test-data/origin/compare_base"
   # Filename to save the scan result.
   # Can be a relative or absolute path. Can also reference the path defined above using ${dir}.
   # It equals to 'z:/compare_base/base.scan.json' below.
@@ -22,7 +24,7 @@ compareBase:
   # It's up to the user to decide whether to load previous result to improve efficiency.
   # The program does not automatically handle potential changes.
   # If set to true but the file does not exist, scanning will be performed.
-  loadScanResult: true
+  loadScanResult: false
   # Whether to compute full file digests for the files being compared.
   # False means computing digest of file header only.
   needFullChecksum: false
@@ -35,10 +37,10 @@ compareBase:
 compareTarget:
   # Compare target path. Can be read-only if not doing moveMore and moveSame operations below.
   # Otherwise must be writable.
-  dir: "e:/temp"
+  dir: "z:/test-data/origin/compare_target"
   # Same as attributes defined in compareBase.
-  scanResultFile: "z:/result/target.scan.json"
-  loadScanResult: true
+  scanResultFile: "z:/test-data/output/t.scan.json"
+  loadScanResult: false
   needFullChecksum: true
 
   # When the file headers are the same and the file lengths are also same, whether to continue comparing the entire file contents.
@@ -48,13 +50,13 @@ compareTarget:
 
   # Path to save the comparison results, must be writable.
   # Can be a relative or absolute path. Can also reference the path defined in above using ${dir}.
-  backupDir: "z:/result/group"
+  backupDir: "z:/test-data/output"
   # Whether to move files in target but not in base to the compare result dir.
   # False means only generating a result file list.
-  moveMore: false
+  moveMore: true
   # Whether to move files that exist in both target and base to the compare result directory.
   # False means only generating a result file list.
-  moveSame: false
+  moveSame: true
 
 # Filter criteria for selecting files to compare.
 filter:
@@ -81,7 +83,7 @@ filter:
 
   # File extensions to exclude, can be left empty.
   exclude:
-    - "*.log"
+    - "*.logg"
 
   # Minimum file size in bytes, 0 or less means no limit,
   # It's better to process starting from 1 byte, 0 byte files are non sense.

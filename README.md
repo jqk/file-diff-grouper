@@ -67,7 +67,7 @@ There are no specific requirements for the configuration filename itself, but it
 $ fdg
 
 Copyright (c) 1999-2023 Not a dream Co., Ltd.
-file difference grouper (fdg) 1.1.0, 2023-09-23
+file difference grouper (fdg) 1.1.1, 2023-09-25
 
 Usage:
   fdg [path/to/the/taskConfigFile]
